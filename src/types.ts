@@ -42,14 +42,14 @@ export const WORK_TYPE_OPTIONS: Option[] = [
 ];
 
 export const REGION_OPTIONS: Option[] = [
-  { value: 'north_america', label: 'North America' },
-  { value: 'europe', label: 'Europe' },
-  { value: 'asia', label: 'Asia' },
-  { value: 'cis', label: 'CIS' },
-  { value: 'middle_east', label: 'Middle East' },
-  { value: 'africa', label: 'Africa' },
-  { value: 'south_america', label: 'South America' },
-  { value: 'australia_oceania', label: 'Australia & Oceania' }
+  { value: 'north_america', label: 'North America (+10%)' },
+  { value: 'europe', label: 'Europe (+8%)' },
+  { value: 'asia', label: 'Asia (+6%)' },
+  { value: 'cis', label: 'CIS (+2%)' },
+  { value: 'middle_east', label: 'Middle East (+7%)' },
+  { value: 'africa', label: 'Africa (+4%)' },
+  { value: 'south_america', label: 'South America (+5%)' },
+  { value: 'australia_oceania', label: 'Australia & Oceania (+9%)' }
 ];
 
 export const DESIGNER_OPTIONS: Option[] = [
@@ -68,3 +68,29 @@ export const URGENCY_DAYS_OPTIONS: Option[] = [
   { value: '2', label: '2 Days (20% extra)' },
   { value: '3', label: '3 Days (10% extra)' }
 ];
+
+// Function to get dynamic label for elements count based on work type
+export const getElementsLabel = (workType: string): string => {
+  switch (workType) {
+    case 'presentation':
+      return 'Number of Slides';
+    case 'website_design':
+    case 'landing_page':
+    case 'web_development':
+      return 'Number of Screens';
+    case 'social_media':
+      return 'Number of Posts';
+    case 'print':
+      return 'Number of Items';
+    case 'illustration':
+      return 'Number of Illustrations';
+    case 'ui_ux':
+      return 'Number of Hours';
+    case 'delegated_support':
+      return 'Number of Tasks';
+    case 'logo':
+    case 'branding':
+    default:
+      return 'Number of Design Elements';
+  }
+};

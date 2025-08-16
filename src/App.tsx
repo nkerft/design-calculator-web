@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ProjectForm, CalculationResult } from './types';
-import { SOURCE_OPTIONS, WORK_TYPE_OPTIONS, REGION_OPTIONS, DESIGNER_OPTIONS, URGENCY_DAYS_OPTIONS } from './types';
-import { calculateProjectCost, formatPriceUSD, formatPriceRUB, getPriceValues } from './calculator';
+import { SOURCE_OPTIONS, WORK_TYPE_OPTIONS, REGION_OPTIONS, DESIGNER_OPTIONS, URGENCY_DAYS_OPTIONS, getElementsLabel } from './types';
+import { calculateProjectCost, formatPriceUSD, formatPriceRUB } from './calculator';
 
 // Custom dropdown component
 interface CustomSelectProps {
@@ -84,7 +84,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ value, onChange, options, p
   );
 };
 
-// Simple number input with plus/minus buttons
+// Number input with horizontal plus/minus buttons
 const NumberInput: React.FC<{ value: number; onChange: (value: number) => void; label: string }> = ({ value, onChange, label }) => {
   const handleIncrement = () => {
     if (value < 50) onChange(value + 1);
@@ -113,25 +113,25 @@ const NumberInput: React.FC<{ value: number; onChange: (value: number) => void; 
           value={value}
           onChange={handleInputChange}
         />
-        <div className="number-controls">
+        <div className="number-controls-horizontal">
           <button 
-            className="number-control-btn number-control-up"
-            onClick={handleIncrement}
-            disabled={value >= 50}
-            title="Increase"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M18 15l-6-6-6 6"/>
-            </svg>
-          </button>
-          <button 
-            className="number-control-btn number-control-down"
+            className="number-control-btn-horizontal"
             onClick={handleDecrement}
             disabled={value <= 1}
             title="Decrease"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M6 9l6 6 6-6"/>
+              <path d="M5 12h14"/>
+            </svg>
+          </button>
+          <button 
+            className="number-control-btn-horizontal"
+            onClick={handleIncrement}
+            disabled={value >= 50}
+            title="Increase"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M12 5v14M5 12h14"/>
             </svg>
           </button>
         </div>
@@ -149,7 +149,6 @@ interface PriceDisplayProps {
 const PriceDisplay: React.FC<PriceDisplayProps> = ({ label, price }) => {
   const [copied, setCopied] = useState(false);
   const [copyType, setCopyType] = useState<'usd' | 'rub' | null>(null);
-  const priceValues = getPriceValues(price);
 
   const copyToClipboard = async (value: string, type: 'usd' | 'rub') => {
     try {
@@ -275,7 +274,7 @@ const App: React.FC = () => {
           <NumberInput
             value={form.elementsCount}
             onChange={(value) => handleInputChange('elementsCount', value)}
-            label="Number of Design Elements"
+            label={getElementsLabel(form.workType)}
           />
 
           <div className="form-group">
