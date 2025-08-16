@@ -1,0 +1,29 @@
+{
+  "short_name": "Design Calc",
+  "name": "Design Calculator - WeTrio",
+  "description": "Калькулятор стоимости дизайн-проектов для координаторов WeTrio",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#15191C",
+  "background_color": "#15191C",
+  "orientation": "portrait",
+  "categories": ["business", "productivity"],
+  "lang": "ru"
+}
