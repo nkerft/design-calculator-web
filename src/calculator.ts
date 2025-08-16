@@ -3,20 +3,7 @@ import { ProjectForm, CalculationResult } from './types';
 // Base price per element for different work types (in dollars)
 const BASE_PRICE_PER_ELEMENT = 30;
 
-// Element types for different work types
-const ELEMENT_TYPES = {
-  presentation: 'slides',           // Количество слайдов
-  website_design: 'pages',          // Количество страниц
-  landing_page: 'sections',         // Количество секций
-  logo: 'variations',               // Количество вариаций логотипа
-  branding: 'elements',             // Количество элементов брендинга
-  social_media: 'posts',            // Количество постов
-  print: 'items',                   // Количество печатных элементов
-  illustration: 'illustrations',    // Количество иллюстраций
-  ui_ux: 'screens',                 // Количество экранов
-  delegated_support: 'hours',       // Количество часов
-  web_development: 'pages'          // Количество страниц
-};
+
 
 // Multipliers for specific designers
 const DESIGNER_MULTIPLIERS = {
@@ -141,10 +128,4 @@ export function formatPriceRUB(price: number): string {
   }).format(rubPrice);
 }
 
-// Function to get raw price values for copying
-export function getPriceValues(price: number) {
-  return {
-    usd: price,
-    rub: Math.round(price * USD_TO_RUB_RATE)
-  };
-}
+
