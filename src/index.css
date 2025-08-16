@@ -14,6 +14,8 @@ body {
   color: #ffffff;
   min-height: 100vh;
   line-height: 1.6;
+  -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
 }
 
 code {
@@ -28,6 +30,7 @@ code {
   padding: 40px 20px;
   position: relative;
   animation: fadeIn 0.8s ease-out;
+  -webkit-overflow-scrolling: touch;
 }
 
 @keyframes fadeIn {
