@@ -790,18 +790,16 @@ input:checked ~ .toggle-label {
     width: 100%;
     max-width: 500px;
     padding: 32px 24px;
-    order: 2;
+    order: 1;
   }
   
   .results-section {
-    position: sticky;
-    top: 0;
+    position: static;
     width: 100%;
     max-width: 500px;
     padding: 30px 20px;
-    order: 1;
-    z-index: 100;
-    margin-bottom: 20px;
+    order: 2;
+    margin-top: 20px;
   }
   
   .header h1 {
