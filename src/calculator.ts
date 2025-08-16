@@ -1,18 +1,21 @@
 import { ProjectForm, CalculationResult } from './types';
 
-// Base rates for different work types (in dollars)
-const BASE_RATES = {
-  presentation: 70,
-  website_design: 200,
-  landing_page: 160,
-  logo: 110,
-  branding: 350,
-  social_media: 40,
-  print: 55,
-  illustration: 80,
-  ui_ux: 280,
-  delegated_support: 25,
-  web_development: 400
+// Base price per element for different work types (in dollars)
+const BASE_PRICE_PER_ELEMENT = 30;
+
+// Element types for different work types
+const ELEMENT_TYPES = {
+  presentation: 'slides',           // Количество слайдов
+  website_design: 'pages',          // Количество страниц
+  landing_page: 'sections',         // Количество секций
+  logo: 'variations',               // Количество вариаций логотипа
+  branding: 'elements',             // Количество элементов брендинга
+  social_media: 'posts',            // Количество постов
+  print: 'items',                   // Количество печатных элементов
+  illustration: 'illustrations',    // Количество иллюстраций
+  ui_ux: 'screens',                 // Количество экранов
+  delegated_support: 'hours',       // Количество часов
+  web_development: 'pages'          // Количество страниц
 };
 
 // Multipliers for specific designers
@@ -56,8 +59,7 @@ const URGENCY_MULTIPLIERS = {
   3: 1.1   // 3 days - 10% extra
 };
 
-// Elements multiplier
-const ELEMENTS_MULTIPLIER = 0.1; // +10% per element
+
 
 // Company margin (multiplier)
 const COMPANY_MARGIN = 1.4;
@@ -67,18 +69,14 @@ const USD_TO_RUB_RATE = 95.5;
 
 export function calculateProjectCost(form: ProjectForm): CalculationResult | null {
   // Calculate based on available fields
-  let baseRate = 0;
   let designerMultiplier = 1.0;
   let regionMultiplier = 1.0;
   let sourceMultiplier = 1.0;
   let urgencyMultiplier = 1.0;
-  let elementsMultiplier = 1.0;
 
-  // Base rate calculation
-  if (form.workType) {
-    baseRate = BASE_RATES[form.workType as keyof typeof BASE_RATES] || 70;
-  } else {
-    baseRate = 70; // Default base rate
+  // Check if we have required fields
+  if (!form.workType || !form.elementsCount) {
+    return null;
   }
 
   // Designer multiplier
@@ -101,17 +99,16 @@ export function calculateProjectCost(form: ProjectForm): CalculationResult | nul
     urgencyMultiplier = URGENCY_MULTIPLIERS[form.urgencyDays as keyof typeof URGENCY_MULTIPLIERS] || 1.0;
   }
 
-  // Elements multiplier
-  elementsMultiplier = 1 + (form.elementsCount * ELEMENTS_MULTIPLIER);
+  // Calculate base price (30$ per element)
+  const basePrice = form.elementsCount * BASE_PRICE_PER_ELEMENT;
 
   // Calculate designer price
   const designerPrice = Math.round(
-    baseRate * 
+    basePrice * 
     designerMultiplier * 
     regionMultiplier * 
     sourceMultiplier * 
-    urgencyMultiplier * 
-    elementsMultiplier
+    urgencyMultiplier
   );
   
   // Calculate client price (with company margin)
