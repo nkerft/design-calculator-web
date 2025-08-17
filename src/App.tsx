@@ -251,6 +251,18 @@ const App: React.FC = () => {
     setResults(calculatedResults);
   }, [form]);
 
+  // Принудительное обновление кэша при загрузке
+  useEffect(() => {
+    // Проверяем, есть ли новая версия приложения
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        registrations.forEach((registration) => {
+          registration.update();
+        });
+      });
+    }
+  }, []);
+
   const handleInputChange = (field: keyof ProjectForm, value: string | number | boolean) => {
     setForm(prev => ({
       ...prev,

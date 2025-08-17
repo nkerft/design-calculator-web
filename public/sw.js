@@ -1,8 +1,6 @@
-const CACHE_NAME = 'design-calculator-v1';
+const CACHE_NAME = 'design-calculator-v2';
 const urlsToCache = [
   '/',
-  '/static/js/main.f8153c81.js',
-  '/static/css/main.3c063b2a.css',
   '/manifest.json'
 ];
 
@@ -14,15 +12,13 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Всегда получаем свежую версию файлов
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      }
-    )
+    fetch(event.request)
+      .catch(() => {
+        // Только если сеть недоступна, используем кэш
+        return caches.match(event.request);
+      })
   );
 });
 
