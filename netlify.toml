@@ -11,37 +11,10 @@
   to = "/index.html"
   status = 200
 
-# Глобальные заголовки для всех файлов
+# Простые заголовки для предотвращения кэширования
 [[headers]]
   for = "/*"
   [headers.values]
-    Cache-Control = "no-cache, no-store, must-revalidate, max-age=0"
-    Pragma = "no-cache"
-    Expires = "0"
-    X-Content-Type-Options = "nosniff"
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
-
-# Специальные заголовки для HTML файлов
-[[headers]]
-  for = "*.html"
-  [headers.values]
-    Cache-Control = "no-cache, no-store, must-revalidate, max-age=0"
-    Pragma = "no-cache"
-    Expires = "0"
-
-# Заголовки для JavaScript файлов
-[[headers]]
-  for = "*.js"
-  [headers.values]
-    Cache-Control = "no-cache, no-store, must-revalidate, max-age=0"
-    Pragma = "no-cache"
-    Expires = "0"
-
-# Заголовки для CSS файлов
-[[headers]]
-  for = "*.css"
-  [headers.values]
-    Cache-Control = "no-cache, no-store, must-revalidate, max-age=0"
+    Cache-Control = "no-cache, no-store, must-revalidate"
     Pragma = "no-cache"
     Expires = "0"
