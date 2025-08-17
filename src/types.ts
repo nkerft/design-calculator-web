@@ -5,7 +5,6 @@ export interface ProjectForm {
   isUrgent: boolean;
   urgencyDays: number;
   region: string;
-  designer: string;
 }
 
 export interface CalculationResult {
@@ -19,9 +18,9 @@ export interface Option {
 }
 
 export const SOURCE_OPTIONS: Option[] = [
-  { value: 'fiverr', label: 'Fiverr' },
-  { value: 'upwork', label: 'Upwork' },
-  { value: 'freelancer', label: 'Freelancer' },
+  { value: 'fiverr', label: 'Fiverr (+20%)' },
+  { value: 'upwork', label: 'Upwork (+20%)' },
+  { value: 'freelancer', label: 'Freelancer (+20%)' },
   { value: 'telegram', label: 'Telegram' },
   { value: 'internal', label: 'Internal' },
   { value: 'other', label: 'Other' }
@@ -29,6 +28,7 @@ export const SOURCE_OPTIONS: Option[] = [
 
 export const WORK_TYPE_OPTIONS: Option[] = [
   { value: 'presentation', label: 'Presentation' },
+  { value: 'template', label: 'Template (Presentation)' },
   { value: 'website_design', label: 'Website Design' },
   { value: 'landing_page', label: 'Landing Page' },
   { value: 'logo', label: 'Logo' },
@@ -52,21 +52,12 @@ export const REGION_OPTIONS: Option[] = [
   { value: 'australia_oceania', label: 'Australia & Oceania (+9%)' }
 ];
 
-export const DESIGNER_OPTIONS: Option[] = [
-  { value: 'alex', label: 'Alex' },
-  { value: 'maria', label: 'Maria' },
-  { value: 'dmitry', label: 'Dmitry' },
-  { value: 'anna', label: 'Anna' },
-  { value: 'sergey', label: 'Sergey' },
-  { value: 'elena', label: 'Elena' },
-  { value: 'andrey', label: 'Andrey' },
-  { value: 'natalia', label: 'Natalia' }
-];
+
 
 export const URGENCY_DAYS_OPTIONS: Option[] = [
-  { value: '1', label: '1 Day (30% extra)' },
-  { value: '2', label: '2 Days (20% extra)' },
-  { value: '3', label: '3 Days (10% extra)' }
+  { value: '1', label: '1 Day (+30%)' },
+  { value: '2', label: '2 Days (+30%)' },
+  { value: '3', label: '3 Days (+10%)' }
 ];
 
 // Function to get dynamic label for elements count based on work type
@@ -74,6 +65,8 @@ export const getElementsLabel = (workType: string): string => {
   switch (workType) {
     case 'presentation':
       return 'Number of Slides';
+    case 'template':
+      return 'Number of Pages';
     case 'website_design':
     case 'landing_page':
     case 'web_development':

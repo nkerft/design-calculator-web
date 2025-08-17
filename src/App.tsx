@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ProjectForm, CalculationResult } from './types';
-import { SOURCE_OPTIONS, WORK_TYPE_OPTIONS, REGION_OPTIONS, DESIGNER_OPTIONS, URGENCY_DAYS_OPTIONS, getElementsLabel } from './types';
+import { SOURCE_OPTIONS, WORK_TYPE_OPTIONS, REGION_OPTIONS, URGENCY_DAYS_OPTIONS, getElementsLabel } from './types';
 import { calculateProjectCost, formatPriceUSD, formatPriceRUB } from './calculator';
 
 // Custom dropdown component
@@ -214,8 +214,7 @@ const App: React.FC = () => {
     elementsCount: 10,
     isUrgent: false,
     urgencyDays: 0,
-    region: '',
-    designer: ''
+    region: ''
   });
 
   const [results, setResults] = useState<CalculationResult | null>(null);
@@ -240,8 +239,7 @@ const App: React.FC = () => {
       elementsCount: 10,
       isUrgent: false,
       urgencyDays: 0,
-      region: '',
-      designer: ''
+      region: ''
     });
     setResults(null);
   };
@@ -310,13 +308,7 @@ const App: React.FC = () => {
             label="Project Region"
           />
 
-          <CustomSelect
-            value={form.designer}
-            onChange={(value) => handleInputChange('designer', value)}
-            options={DESIGNER_OPTIONS}
-            placeholder="Select designer"
-            label="Assigned Designer"
-          />
+
 
           <div className="button-group">
             <button 

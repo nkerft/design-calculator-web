@@ -1,20 +1,17 @@
 import { ProjectForm, CalculationResult } from './types';
 
-// Base price per element for different work types (in dollars)
-const BASE_PRICE_PER_ELEMENT = 30;
+// Presentation pricing tiers (per slide)
+const PRESENTATION_PRICES = {
+  small: { min: 1, max: 14, price: 30 },      // <15 slides: $30 per slide
+  medium: { min: 15, max: 30, price: 25 },    // 15-30 slides: $25 per slide
+  large: { min: 31, max: 50, price: 20 },     // 31-50 slides: $20 per slide
+  xlarge: { min: 51, max: 999, price: 15 }    // >50 slides: $15 per slide
+};
 
-
-
-// Multipliers for specific designers
-const DESIGNER_MULTIPLIERS = {
-  alex: 1.4,      // Alex - experienced designer
-  maria: 1.2,     // Maria - mid-level
-  dmitry: 1.6,    // Dmitry - high level
-  anna: 1.1,      // Anna - beginner
-  sergey: 1.3,    // Sergey - experienced
-  elena: 1.0,     // Elena - basic level
-  andrey: 1.5,    // Andrey - high level
-  natalia: 1.2    // Natalia - mid-level
+// Template pricing
+const TEMPLATE_PRICES = {
+  basic: { maxSlides: 10, price: 300 },       // Basic template up to 10 slides: $300
+  extended: { baseSlides: 20, basePrice: 500, additionalPrice: 10 } // Extended template: $500 for 20 slides + $10 per additional slide
 };
 
 // Multipliers for world regions
@@ -29,47 +26,52 @@ const REGION_MULTIPLIERS = {
   cis: 1.1               // CIS - slightly above average
 };
 
-// Multipliers for sources
+// Multipliers for sources (freelance platforms get +20%)
 const SOURCE_MULTIPLIERS = {
-  fiverr: 0.9,
-  upwork: 1.0,
-  freelancer: 0.95,
-  telegram: 1.1,
-  internal: 1.2,
-  other: 1.0
+  fiverr: 1.2,      // +20% for freelance platforms
+  upwork: 1.2,      // +20% for freelance platforms
+  freelancer: 1.2,  // +20% for freelance platforms
+  telegram: 1.0,    // No additional cost
+  internal: 1.0,    // No additional cost
+  other: 1.0        // No additional cost
 };
 
 // Urgency multipliers based on days
 const URGENCY_MULTIPLIERS = {
   1: 1.3,  // 1 day - 30% extra
-  2: 1.2,  // 2 days - 20% extra
+  2: 1.3,  // 2 days - 30% extra (changed from 20%)
   3: 1.1   // 3 days - 10% extra
 };
 
 
 
-// Company margin (multiplier)
-const COMPANY_MARGIN = 1.4;
+
 
 // Current exchange rate (USD to RUB) - you can update this or fetch from API
 const USD_TO_RUB_RATE = 95.5;
 
 export function calculateProjectCost(form: ProjectForm): CalculationResult | null {
-  // Calculate based on available fields
-  let designerMultiplier = 1.0;
-  let regionMultiplier = 1.0;
-  let sourceMultiplier = 1.0;
-  let urgencyMultiplier = 1.0;
-
   // Check if we have required fields
   if (!form.workType || !form.elementsCount) {
     return null;
   }
 
-  // Designer multiplier
-  if (form.designer) {
-    designerMultiplier = DESIGNER_MULTIPLIERS[form.designer as keyof typeof DESIGNER_MULTIPLIERS] || 1.0;
+  let basePrice = 0;
+
+  // Calculate base price based on work type
+  if (form.workType === 'presentation') {
+    basePrice = calculatePresentationPrice(form.elementsCount, false);
+  } else if (form.workType === 'template') {
+    basePrice = calculatePresentationPrice(form.elementsCount, true);
+  } else {
+    // For other work types, use default pricing (we'll update this later)
+    basePrice = form.elementsCount * 30;
   }
+
+  // Apply multipliers
+  let regionMultiplier = 1.0;
+  let sourceMultiplier = 1.0;
+  let urgencyMultiplier = 1.0;
 
   // Region multiplier
   if (form.region) {
@@ -86,25 +88,48 @@ export function calculateProjectCost(form: ProjectForm): CalculationResult | nul
     urgencyMultiplier = URGENCY_MULTIPLIERS[form.urgencyDays as keyof typeof URGENCY_MULTIPLIERS] || 1.0;
   }
 
-  // Calculate base price (30$ per element)
-  const basePrice = form.elementsCount * BASE_PRICE_PER_ELEMENT;
-
-  // Calculate designer price
-  const designerPrice = Math.round(
+  // Calculate final client price
+  const clientPrice = Math.round(
     basePrice * 
-    designerMultiplier * 
     regionMultiplier * 
     sourceMultiplier * 
     urgencyMultiplier
   );
   
-  // Calculate client price (with company margin)
-  const clientPrice = Math.round(designerPrice * COMPANY_MARGIN);
+  // Designer price is 35% of client price
+  const designerPrice = Math.round(clientPrice * 0.35);
 
   return {
     clientPrice,
     designerPrice
   };
+}
+
+// Function to calculate presentation price based on slide count and template type
+function calculatePresentationPrice(slideCount: number, isTemplate: boolean): number {
+  if (isTemplate) {
+    // Template pricing
+    if (slideCount <= TEMPLATE_PRICES.basic.maxSlides) {
+      return TEMPLATE_PRICES.basic.price;
+    } else {
+      // Extended template pricing
+      const basePrice = TEMPLATE_PRICES.extended.basePrice;
+      const additionalSlides = Math.max(0, slideCount - TEMPLATE_PRICES.extended.baseSlides);
+      const additionalPrice = additionalSlides * TEMPLATE_PRICES.extended.additionalPrice;
+      return basePrice + additionalPrice;
+    }
+  } else {
+    // Regular presentation pricing based on slide count
+    if (slideCount <= PRESENTATION_PRICES.small.max) {
+      return slideCount * PRESENTATION_PRICES.small.price;
+    } else if (slideCount <= PRESENTATION_PRICES.medium.max) {
+      return slideCount * PRESENTATION_PRICES.medium.price;
+    } else if (slideCount <= PRESENTATION_PRICES.large.max) {
+      return slideCount * PRESENTATION_PRICES.large.price;
+    } else {
+      return slideCount * PRESENTATION_PRICES.xlarge.price;
+    }
+  }
 }
 
 // Function for formatting price in dollars
