@@ -121,6 +121,44 @@ code {
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
 }
 
+/* Кнопка Reset в правом верхнем углу */
+.reset-button {
+  position: absolute;
+  top: 20px;
+  right: 48px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  z-index: 20;
+}
+
+.reset-button:hover {
+  color: #C3FF19;
+  background: rgba(195, 255, 25, 0.1);
+  transform: scale(1.05);
+}
+
+.reset-button:active {
+  transform: scale(0.95);
+}
+
+.reset-button svg {
+  transition: transform 0.3s ease;
+}
+
+.reset-button:hover svg {
+  transform: rotate(180deg);
+}
+
 .results-section {
   position: sticky;
   top: 40px;
@@ -147,7 +185,20 @@ code {
 .form-group {
   margin-bottom: 32px;
   animation: fadeInUp 0.8s ease-out;
+  position: relative;
 }
+
+/* Управляем z-index для dropdown в зависимости от позиции */
+.form-group:nth-child(1) .custom-select { z-index: 10; }
+.form-group:nth-child(2) .custom-select { z-index: 9; }
+.form-group:nth-child(3) .custom-select { z-index: 8; }
+.form-group:nth-child(4) .custom-select { z-index: 7; }
+.form-group:nth-child(5) .custom-select { z-index: 6; }
+.form-group:nth-child(6) .custom-select { z-index: 5; }
+.form-group:nth-child(7) .custom-select { z-index: 4; }
+.form-group:nth-child(8) .custom-select { z-index: 3; }
+.form-group:nth-child(9) .custom-select { z-index: 2; }
+.form-group:nth-child(10) .custom-select { z-index: 1; }
 
 .form-group:nth-child(1) { animation-delay: 0.8s; }
 .form-group:nth-child(2) { animation-delay: 0.9s; }
@@ -358,6 +409,13 @@ code {
 .custom-select {
   position: relative;
   width: 100%;
+  /* Убеждаемся, что dropdown не наслаивается на другие элементы */
+  z-index: 1;
+}
+
+/* Когда dropdown открыт, увеличиваем z-index */
+.custom-select:has(.custom-select__dropdown) {
+  z-index: 10;
 }
 
 .custom-select__header {
@@ -412,26 +470,33 @@ code {
   top: 100%;
   left: 0;
   right: 0;
-  background: #1a1a1a;
+  background: #1a1a1a !important;
   border: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   margin-top: 8px;
   max-height: none;
   overflow-y: visible;
-  z-index: 1000;
+  z-index: 100;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(20px);
   animation: dropdownSlideIn 0.3s ease-out;
+  /* Принудительно устанавливаем фон */
+  background-color: #1a1a1a !important;
+  background-image: none !important;
+  /* Убеждаемся, что dropdown поверх всех элементов формы */
+  isolation: isolate;
 }
 
 @keyframes dropdownSlideIn {
   from {
     opacity: 0;
     transform: translateY(-10px);
+    background: #1a1a1a;
   }
   to {
     opacity: 1;
     transform: translateY(0);
+    background: #1a1a1a;
   }
 }
 
@@ -448,6 +513,9 @@ code {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  /* Принудительно устанавливаем фон для опций */
+  background: transparent !important;
+  background-color: transparent !important;
 }
 
 .custom-select__option:hover {
@@ -787,6 +855,24 @@ input:checked ~ .toggle-label {
     flex-direction: column;
     gap: 20px;
     align-items: center;
+  }
+  
+  /* Исправляем проблемы с dropdown на мобильных */
+  .custom-select__dropdown {
+    z-index: 99999 !important;
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+    position: fixed !important;
+    top: auto !important;
+    left: 16px !important;
+    right: 16px !important;
+    max-height: 300px !important;
+    overflow-y: auto !important;
+  }
+  
+  /* На мобильных все dropdown имеют одинаковый z-index */
+  .form-group .custom-select {
+    z-index: 1 !important;
   }
   
   .form-section {

@@ -55,9 +55,8 @@ export const REGION_OPTIONS: Option[] = [
 
 
 export const URGENCY_DAYS_OPTIONS: Option[] = [
-  { value: '1', label: '1 Day (+30%)' },
-  { value: '2', label: '2 Days (+30%)' },
-  { value: '3', label: '3 Days (+10%)' }
+  { value: '1', label: '1 Day (+50%)' },
+  { value: '2', label: '2 Days (+30%)' }
 ];
 
 // Function to get dynamic label for elements count based on work type
@@ -82,6 +81,7 @@ export const getElementsLabel = (workType: string): string => {
     case 'delegated_support':
       return 'Number of Tasks';
     case 'logo':
+      return 'Number of Options';
     case 'branding':
     default:
       return 'Number of Design Elements';

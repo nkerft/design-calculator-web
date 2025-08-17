@@ -14,16 +14,16 @@ const TEMPLATE_PRICES = {
   extended: { baseSlides: 20, basePrice: 500, additionalPrice: 10 } // Extended template: $500 for 20 slides + $10 per additional slide
 };
 
-// Multipliers for world regions
-const REGION_MULTIPLIERS = {
-  north_america: 1.8,    // North America - high rates
-  europe: 1.5,           // Europe - high rates
-  asia: 1.2,             // Asia - medium rates
-  middle_east: 1.4,      // Middle East - above average
-  africa: 0.8,           // Africa - below average
-  south_america: 1.0,    // South America - medium rates
-  australia_oceania: 1.6, // Australia & Oceania - high rates
-  cis: 1.1               // CIS - slightly above average
+// Region percentage additions (not multipliers)
+const REGION_PERCENTAGES = {
+  north_america: 10,     // North America - +10%
+  europe: 8,             // Europe - +8%
+  asia: 6,               // Asia - +6%
+  middle_east: 7,        // Middle East - +7%
+  africa: 4,             // Africa - +4%
+  south_america: 5,      // South America - +5%
+  australia_oceania: 9,  // Australia & Oceania - +9%
+  cis: 2                 // CIS - +2%
 };
 
 // Multipliers for sources (freelance platforms get +20%)
@@ -38,14 +38,9 @@ const SOURCE_MULTIPLIERS = {
 
 // Urgency multipliers based on days
 const URGENCY_MULTIPLIERS = {
-  1: 1.3,  // 1 day - 30% extra
-  2: 1.3,  // 2 days - 30% extra (changed from 20%)
-  3: 1.1   // 3 days - 10% extra
+  1: 1.5,  // 1 day - 50% extra
+  2: 1.3   // 2 days - 30% extra
 };
-
-
-
-
 
 // Current exchange rate (USD to RUB) - you can update this or fetch from API
 const USD_TO_RUB_RATE = 95.5;
@@ -68,14 +63,14 @@ export function calculateProjectCost(form: ProjectForm): CalculationResult | nul
     basePrice = form.elementsCount * 30;
   }
 
-  // Apply multipliers
-  let regionMultiplier = 1.0;
+  // Apply multipliers and additions
   let sourceMultiplier = 1.0;
   let urgencyMultiplier = 1.0;
+  let regionPercentage = 0;
 
-  // Region multiplier
+  // Region percentage addition
   if (form.region) {
-    regionMultiplier = REGION_MULTIPLIERS[form.region as keyof typeof REGION_MULTIPLIERS] || 1.0;
+    regionPercentage = REGION_PERCENTAGES[form.region as keyof typeof REGION_PERCENTAGES] || 0;
   }
 
   // Source multiplier
@@ -91,9 +86,9 @@ export function calculateProjectCost(form: ProjectForm): CalculationResult | nul
   // Calculate final client price
   const clientPrice = Math.round(
     basePrice * 
-    regionMultiplier * 
     sourceMultiplier * 
-    urgencyMultiplier
+    urgencyMultiplier * 
+    (1 + regionPercentage / 100)
   );
   
   // Designer price is 35% of client price

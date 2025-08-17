@@ -86,18 +86,43 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ value, onChange, options, p
 
 // Number input with horizontal plus/minus buttons
 const NumberInput: React.FC<{ value: number; onChange: (value: number) => void; label: string }> = ({ value, onChange, label }) => {
+  const [inputValue, setInputValue] = useState(value.toString());
+
+  // Update input value when prop changes
+  useEffect(() => {
+    setInputValue(value.toString());
+  }, [value]);
+
   const handleIncrement = () => {
-    if (value < 50) onChange(value + 1);
+    const newValue = Math.min(value + 1, 99999);
+    onChange(newValue);
   };
 
   const handleDecrement = () => {
-    if (value > 1) onChange(value - 1);
+    const newValue = Math.max(value - 1, 1);
+    onChange(newValue);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = parseInt(e.target.value) || 1;
-    if (newValue >= 1 && newValue <= 50) {
+    const inputVal = e.target.value;
+    setInputValue(inputVal);
+    
+    // Allow empty input for better UX
+    if (inputVal === '') {
+      return;
+    }
+    
+    const newValue = parseInt(inputVal);
+    if (!isNaN(newValue) && newValue >= 1 && newValue <= 99999) {
       onChange(newValue);
+    }
+  };
+
+  const handleInputBlur = () => {
+    // If input is empty or invalid, reset to current value
+    const numValue = parseInt(inputValue);
+    if (isNaN(numValue) || numValue < 1 || numValue > 99999) {
+      setInputValue(value.toString());
     }
   };
 
@@ -109,9 +134,10 @@ const NumberInput: React.FC<{ value: number; onChange: (value: number) => void; 
           type="number"
           className="number-input-field"
           min="1"
-          max="50"
-          value={value}
+          max="99999"
+          value={inputValue}
           onChange={handleInputChange}
+          onBlur={handleInputBlur}
         />
         <div className="number-controls-horizontal">
           <button 
@@ -127,7 +153,7 @@ const NumberInput: React.FC<{ value: number; onChange: (value: number) => void; 
           <button 
             className="number-control-btn-horizontal"
             onClick={handleIncrement}
-            disabled={value >= 50}
+            disabled={value >= 99999}
             title="Increase"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -253,6 +279,20 @@ const App: React.FC = () => {
 
       <div className="main-content">
         <div className="form-section">
+          <button 
+            className="reset-button" 
+            onClick={handleReset}
+            title="Reset all fields"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+              <path d="M21 3v5h-5"/>
+              <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+              <path d="M3 21v-5h5"/>
+            </svg>
+            <span>Reset</span>
+          </button>
+          
           <CustomSelect
             value={form.source}
             onChange={(value) => handleInputChange('source', value)}
@@ -310,21 +350,7 @@ const App: React.FC = () => {
 
 
 
-          <div className="button-group">
-            <button 
-              className="btn btn-secondary" 
-              onClick={handleReset}
-              title="Reset all fields"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '8px' }}>
-                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                <path d="M21 3v5h-5"/>
-                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                <path d="M3 21v-5h5"/>
-              </svg>
-              Reset Form
-            </button>
-          </div>
+
         </div>
 
         <div className="results-section">
