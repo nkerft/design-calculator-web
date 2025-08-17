@@ -251,6 +251,7 @@ const App: React.FC = () => {
       <div className="header">
         <h1>Design Calculator</h1>
         <p>Project cost calculator for WeTrio coordinators - Updated</p>
+        <p style={{color: 'red', fontSize: '18px'}}>TEST: If you see this, React is working!</p>
       </div>
 
       <div className="main-content">
