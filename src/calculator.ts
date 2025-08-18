@@ -1,29 +1,91 @@
 import { ProjectForm, CalculationResult } from './types';
 
-// Presentation pricing tiers (per slide)
-const PRESENTATION_PRICES = {
-  small: { min: 1, max: 14, price: 30 },      // <15 slides: $30 per slide
-  medium: { min: 15, max: 30, price: 25 },    // 15-30 slides: $25 per slide
-  large: { min: 31, max: 50, price: 20 },     // 31-50 slides: $20 per slide
-  xlarge: { min: 51, max: 999, price: 15 }    // >50 slides: $15 per slide
-};
-
-// Template pricing
-const TEMPLATE_PRICES = {
-  basic: { maxSlides: 10, price: 300 },       // Basic template up to 10 slides: $300
-  extended: { baseSlides: 20, basePrice: 500, additionalPrice: 10 } // Extended template: $500 for 20 slides + $10 per additional slide
+// Pricing configuration for different work types
+const PRICING_CONFIG = {
+  presentation: {
+    basePrice: 28,        // Starting price per slide
+    minPrice: 7,         // Minimum price per slide
+    breakpoint: 150,      // At this quantity, price becomes minimum
+    name: 'slide'
+  },
+  template: {
+    basePrice: 30,        // Starting price per page
+    minPrice: 10,         // Minimum price per page
+    breakpoint: 100,      // At this quantity, price becomes minimum
+    name: 'page'
+  },
+  website_design: {
+    basePrice: 200,       // Starting price per screen
+    minPrice: 80,         // Minimum price per screen
+    breakpoint: 50,       // At this quantity, price becomes minimum
+    name: 'screen'
+  },
+  landing_page: {
+    basePrice: 160,       // Starting price per screen
+    minPrice: 60,         // Minimum price per screen
+    breakpoint: 30,       // At this quantity, price becomes minimum
+    name: 'screen'
+  },
+  logo: {
+    basePrice: 110,       // Starting price per option
+    minPrice: 40,         // Minimum price per option
+    breakpoint: 20,       // At this quantity, price becomes minimum
+    name: 'option'
+  },
+  branding: {
+    basePrice: 350,       // Starting price per element
+    minPrice: 120,        // Minimum price per element
+    breakpoint: 25,       // At this quantity, price becomes minimum
+    name: 'element'
+  },
+  social_media: {
+    basePrice: 40,        // Starting price per post
+    minPrice: 15,         // Minimum price per post
+    breakpoint: 50,       // At this quantity, price becomes minimum
+    name: 'post'
+  },
+  print: {
+    basePrice: 55,        // Starting price per item
+    minPrice: 20,         // Minimum price per item
+    breakpoint: 40,       // At this quantity, price becomes minimum
+    name: 'item'
+  },
+  illustration: {
+    basePrice: 80,        // Starting price per illustration
+    minPrice: 30,         // Minimum price per illustration
+    breakpoint: 30,       // At this quantity, price becomes minimum
+    name: 'illustration'
+  },
+  ui_ux: {
+    basePrice: 280,       // Starting price per hour
+    minPrice: 100,        // Minimum price per hour
+    breakpoint: 40,       // At this quantity, price becomes minimum
+    name: 'hour'
+  },
+  delegated_support: {
+    basePrice: 25,        // Starting price per task
+    minPrice: 10,         // Minimum price per task
+    breakpoint: 100,      // At this quantity, price becomes minimum
+    name: 'task'
+  },
+  web_development: {
+    basePrice: 400,       // Starting price per page
+    minPrice: 150,        // Minimum price per page
+    breakpoint: 20,       // At this quantity, price becomes minimum
+    name: 'page'
+  }
 };
 
 // Region percentage additions (not multipliers)
 const REGION_PERCENTAGES = {
   north_america: 10,     // North America - +10%
-  europe: 8,             // Europe - +8%
-  asia: 6,               // Asia - +6%
+  europe: 0,             // Europe - +0%
+  asia: 10,              // Asia - +10%
   middle_east: 7,        // Middle East - +7%
-  africa: 4,             // Africa - +4%
-  south_america: 5,      // South America - +5%
-  australia_oceania: 9,  // Australia & Oceania - +9%
-  cis: 2                 // CIS - +2%
+  africa: -10,           // Africa - -10%
+  south_america: 0,      // South America - +0%
+  australia_oceania: 10, // Australia & Oceania - +10%
+  cis: -10               // CIS - -10%
 };
 
 // Multipliers for sources (freelance platforms get +20%)
@@ -54,14 +116,7 @@ export function calculateProjectCost(form: ProjectForm): CalculationResult | nul
   let basePrice = 0;
 
   // Calculate base price based on work type
-  if (form.workType === 'presentation') {
-    basePrice = calculatePresentationPrice(form.elementsCount, false);
-  } else if (form.workType === 'template') {
-    basePrice = calculatePresentationPrice(form.elementsCount, true);
-  } else {
-    // For other work types, use default pricing (we'll update this later)
-    basePrice = form.elementsCount * 30;
-  }
+  basePrice = calculateDynamicPrice(form.workType, form.elementsCount);
 
   // Apply multipliers and additions
   let sourceMultiplier = 1.0;
@@ -100,31 +155,26 @@ export function calculateProjectCost(form: ProjectForm): CalculationResult | nul
   };
 }
 
-// Function to calculate presentation price based on slide count and template type
-function calculatePresentationPrice(slideCount: number, isTemplate: boolean): number {
-  if (isTemplate) {
-    // Template pricing
-    if (slideCount <= TEMPLATE_PRICES.basic.maxSlides) {
-      return TEMPLATE_PRICES.basic.price;
-    } else {
-      // Extended template pricing
-      const basePrice = TEMPLATE_PRICES.extended.basePrice;
-      const additionalSlides = Math.max(0, slideCount - TEMPLATE_PRICES.extended.baseSlides);
-      const additionalPrice = additionalSlides * TEMPLATE_PRICES.extended.additionalPrice;
-      return basePrice + additionalPrice;
-    }
-  } else {
-    // Regular presentation pricing based on slide count
-    if (slideCount <= PRESENTATION_PRICES.small.max) {
-      return slideCount * PRESENTATION_PRICES.small.price;
-    } else if (slideCount <= PRESENTATION_PRICES.medium.max) {
-      return slideCount * PRESENTATION_PRICES.medium.price;
-    } else if (slideCount <= PRESENTATION_PRICES.large.max) {
-      return slideCount * PRESENTATION_PRICES.large.price;
-    } else {
-      return slideCount * PRESENTATION_PRICES.xlarge.price;
-    }
+// Function to calculate dynamic price based on quantity
+function calculateDynamicPrice(workType: string, quantity: number): number {
+  const config = PRICING_CONFIG[workType as keyof typeof PRICING_CONFIG];
+  
+  if (!config) {
+    // Fallback for unknown work types
+    return quantity * 30;
   }
+  
+  // Calculate price per unit using smooth decrease
+  let pricePerUnit = config.basePrice;
+  
+  if (quantity > 1) {
+    // Calculate the reduction factor based on quantity
+    const reductionFactor = Math.min(quantity / config.breakpoint, 1);
+    const priceReduction = (config.basePrice - config.minPrice) * reductionFactor;
+    pricePerUnit = config.basePrice - priceReduction;
+  }
+  
+  return Math.round(quantity * pricePerUnit);
 }
 
 // Function for formatting price in dollars

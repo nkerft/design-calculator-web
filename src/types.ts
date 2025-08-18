@@ -43,13 +43,13 @@ export const WORK_TYPE_OPTIONS: Option[] = [
 
 export const REGION_OPTIONS: Option[] = [
   { value: 'north_america', label: 'North America (+10%)' },
-  { value: 'europe', label: 'Europe (+8%)' },
-  { value: 'asia', label: 'Asia (+6%)' },
-  { value: 'cis', label: 'CIS (+2%)' },
+  { value: 'europe', label: 'Europe (+0%)' },
+  { value: 'asia', label: 'Asia (+10%)' },
+  { value: 'cis', label: 'CIS (-10%)' },
   { value: 'middle_east', label: 'Middle East (+7%)' },
-  { value: 'africa', label: 'Africa (+4%)' },
-  { value: 'south_america', label: 'South America (+5%)' },
-  { value: 'australia_oceania', label: 'Australia & Oceania (+9%)' }
+  { value: 'africa', label: 'Africa (-10%)' },
+  { value: 'south_america', label: 'South America (+0%)' },
+  { value: 'australia_oceania', label: 'Australia & Oceania (+10%)' }
 ];
 
 
