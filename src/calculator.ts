@@ -85,7 +85,7 @@ const REGION_PERCENTAGES = {
   africa: -10,           // Africa - -10%
   south_america: 0,      // South America - +0%
   australia_oceania: 10, // Australia & Oceania - +10%
-  cis: -10               // CIS - -10%
+  cis: 0                 // CIS - +0%
 };
 
 // Multipliers for sources (freelance platforms get +20%)
