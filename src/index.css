@@ -749,8 +749,8 @@ input:checked ~ .toggle-label {
 }
 
 .copy-button {
-  background: rgba(195, 255, 25, 0.08);
-  border: 1px solid rgba(195, 255, 25, 0.15);
+  background: transparent;
+  border: none;
   color: #C3FF19;
   cursor: pointer;
   padding: 10px;
@@ -765,9 +765,9 @@ input:checked ~ .toggle-label {
 
 .copy-button:hover {
   background: rgba(195, 255, 25, 0.15);
-  border-color: rgba(195, 255, 25, 0.25);
+  border: none;
   transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(195, 255, 25, 0.15);
+  box-shadow: none;
 }
 
 .copy-button:active {
