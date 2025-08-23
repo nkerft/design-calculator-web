@@ -3,9 +3,9 @@ import { ProjectForm, CalculationResult } from './types';
 // Configuration object
 const CONFIG = {
   workTypes: {
-    presentationFormat: { base: 15, min: 5, breakpoint: 150, type_adj_pp: -4 },
-    presentationDesign: { base: 30, min: 10, breakpoint: 150, type_adj_pp: 0 },
-    template: { base: 30, min: 10, breakpoint: 100, type_adj_pp: 0 },
+    presentation_format: { base: 15, min: 5, breakpoint: 150, type_adj_pp: -4 },
+    presentation_design: { base: 30, min: 10, breakpoint: 150, type_adj_pp: 0 },
+    template: { base: 200, min: 30, breakpoint: 1, type_adj_pp: 0 },
     website_design: { base: 200, min: 80, breakpoint: 50, type_adj_pp: 0 },
     landing_page: { base: 160, min: 60, breakpoint: 30, type_adj_pp: 0 },
     logo: { base: 110, min: 40, breakpoint: 20, type_adj_pp: 0 },
@@ -47,7 +47,9 @@ function clamp(value: number, min: number, max: number): number {
 // Calculate price per unit using linear model
 function pricePerUnit(n: number, base: number, min: number, breakpoint: number): number {
   const progress = clamp((n - 1) / breakpoint, 0, 1);
-  return base - (base - min) * progress;
+  const result = base - (base - min) * progress;
+  console.log(`pricePerUnit: n=${n}, base=${base}, min=${min}, breakpoint=${breakpoint}, progress=${progress}, result=${result}`);
+  return result;
 }
 
 // Calculate base sum for all units
@@ -57,7 +59,22 @@ function calcBaseSum(n: number, workType: string): number {
     return n * 30; // fallback
   }
   
+  // Special logic for template
+  if (workType === 'template') {
+    if (n <= 5) {
+      console.log(`calcBaseSum: workType=${workType}, n=${n}, template logic: 5 pages = $200, total=$200`);
+      return 200; // Fixed price for 5 pages or less
+    } else {
+      const additionalPages = n - 5;
+      const additionalCost = additionalPages * 30;
+      const totalCost = 200 + additionalCost;
+      console.log(`calcBaseSum: workType=${workType}, n=${n}, template logic: 5 pages = $200 + ${additionalPages} additional pages × $30 = $${totalCost}`);
+      return totalCost;
+    }
+  }
+  
   const pricePerUnitValue = pricePerUnit(n, config.base, config.min, config.breakpoint);
+  console.log(`calcBaseSum: workType=${workType}, n=${n}, base=${config.base}, min=${config.min}, pricePerUnit=${pricePerUnitValue}, total=${pricePerUnitValue * n}`);
   return pricePerUnitValue * n;
 }
 
@@ -104,8 +121,8 @@ function calcDesignerPay(baseSum: number, urgency: number, sharePP: number, disc
 // Calculate estimated hours
 function calculateEstimatedHours(workType: string, quantity: number): { min: number; max: number } {
   const hoursConfig = {
-    presentationDesign: { min: 0.8, max: 1.2 },
-    presentationFormat: { min: 0.4, max: 0.6 },
+    presentation_design: { min: 0.8, max: 1.2 },
+    presentation_format: { min: 0.4, max: 0.6 },
     template: { min: 1.0, max: 1.5 },
     website_design: { min: 4.0, max: 6.0 },
     landing_page: { min: 3.0, max: 4.5 },
@@ -136,6 +153,9 @@ export function calculateProjectCost(form: ProjectForm): CalculationResult | nul
     return null;
   }
 
+  console.log(`=== DEBUG START ===`);
+  console.log(`calculateProjectCost: workType=${form.workType}, elementsCount=${form.elementsCount}`);
+  
   // Calculate base sum
   const baseSum = calcBaseSum(form.elementsCount, form.workType);
   

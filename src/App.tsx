@@ -86,8 +86,16 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ value, onChange, options, p
 };
 
 // Number input with horizontal plus/minus buttons
-const NumberInput: React.FC<{ value: number; onChange: (value: number) => void; label: string }> = ({ value, onChange, label }) => {
+const NumberInput: React.FC<{ value: number; onChange: (value: number) => void; label: string; workType?: string }> = ({ value, onChange, label, workType }) => {
   const [inputValue, setInputValue] = useState(value.toString());
+
+  // Determine minimum value based on work type
+  const getMinValue = () => {
+    if (workType === 'template') return 5;
+    return 1;
+  };
+
+  const minValue = getMinValue();
 
   // Update input value when prop changes
   useEffect(() => {
@@ -100,7 +108,7 @@ const NumberInput: React.FC<{ value: number; onChange: (value: number) => void; 
   };
 
   const handleDecrement = () => {
-    const newValue = Math.max(value - 1, 1);
+    const newValue = Math.max(value - 1, minValue);
     onChange(newValue);
   };
 
@@ -114,7 +122,7 @@ const NumberInput: React.FC<{ value: number; onChange: (value: number) => void; 
     }
     
     const newValue = parseInt(inputVal);
-    if (!isNaN(newValue) && newValue >= 1 && newValue <= 99999) {
+    if (!isNaN(newValue) && newValue >= minValue && newValue <= 99999) {
       onChange(newValue);
     }
   };
@@ -122,7 +130,7 @@ const NumberInput: React.FC<{ value: number; onChange: (value: number) => void; 
   const handleInputBlur = () => {
     // If input is empty or invalid, reset to current value
     const numValue = parseInt(inputValue);
-    if (isNaN(numValue) || numValue < 1 || numValue > 99999) {
+    if (isNaN(numValue) || numValue < minValue || numValue > 99999) {
       setInputValue(value.toString());
     }
   };
@@ -134,7 +142,7 @@ const NumberInput: React.FC<{ value: number; onChange: (value: number) => void; 
         <input
           type="number"
           className="number-input-field"
-          min="1"
+          min={minValue}
           max="99999"
           value={inputValue}
           onChange={handleInputChange}
@@ -144,7 +152,7 @@ const NumberInput: React.FC<{ value: number; onChange: (value: number) => void; 
           <button 
             className="number-control-btn-horizontal"
             onClick={handleDecrement}
-            disabled={value <= 1}
+            disabled={value <= minValue}
             title="Decrease"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -336,6 +344,15 @@ const App: React.FC = () => {
     setResults(calculatedResults);
   }, [form]);
 
+  // Update elementsCount when workType changes
+  useEffect(() => {
+    if (form.workType === 'template' && form.elementsCount < 5) {
+      setForm(prev => ({ ...prev, elementsCount: 5 }));
+    } else if (form.workType !== 'template' && form.elementsCount < 1) {
+      setForm(prev => ({ ...prev, elementsCount: 1 }));
+    }
+  }, [form.workType]);
+
 
 
   const handleInputChange = (field: keyof ProjectForm, value: string | number | boolean) => {
@@ -346,6 +363,14 @@ const App: React.FC = () => {
   };
 
   const handleReset = () => {
+    // Прокручиваем страницу вверх на мобильных устройствах
+    if (window.innerWidth <= 768) {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+    
     setForm({
       source: '',
       workType: '',
@@ -361,10 +386,10 @@ const App: React.FC = () => {
   return (
     <div className="page-wrapper">
       <div className="container">
-        <div className="header">
-          <h1>Design Calculator</h1>
-          <p>Project cost calculator for WeTrio coordinators</p>
-        </div>
+                 <div className="header">
+           <h1>Design Calculator</h1>
+           <p>Cost Estimation Tool for WeTrio</p>
+         </div>
 
         <div className="main-content">
           <div className="form-section">
@@ -389,6 +414,7 @@ const App: React.FC = () => {
               value={form.elementsCount}
               onChange={(value) => handleInputChange('elementsCount', value)}
               label={getElementsLabel(form.workType)}
+              workType={form.workType}
             />
 
             <UrgencyButtons
@@ -413,33 +439,33 @@ const App: React.FC = () => {
 
           </div>
 
-          <div className="results-column">
-            <div className="results-section">
-              <div className="results">
-                {results ? (
-                  <>
-                    <PriceDisplay 
-                      label="Project Cost for WeTrio" 
-                      price={results.clientPrice} 
-                    />
-                    <PriceDisplay 
-                      label="Designer Work Cost" 
-                      price={results.designerPrice}
-                    />
-                    <div className="estimated-hours">
-                      <span className="estimated-hours-label">Estimated hours:</span>
-                      <span className="estimated-hours-value">
-                        {results.estimatedHours.min}–{results.estimatedHours.max}h
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="empty-state">
-                    <h3>Start filling the form</h3>
-                    <p>Select options to see calculated prices</p>
+          <div className="results-section">
+            <div className="results">
+              {results ? (
+                <>
+                  <PriceDisplay 
+                    label="Project Cost for WeTrio" 
+                    price={results.clientPrice} 
+                  />
+                  <PriceDisplay 
+                    label="Designer Work Cost" 
+                    price={results.designerPrice}
+                  />
+                  <div className="estimated-hours">
+                    <span className="estimated-hours-label">Estimated hours:</span>
+                    <span className="estimated-hours-value">
+                      {results.estimatedHours.min === results.estimatedHours.max 
+                        ? `${results.estimatedHours.min}h` 
+                        : `${results.estimatedHours.min}–${results.estimatedHours.max}h`}
+                    </span>
                   </div>
-                )}
-              </div>
+                </>
+              ) : (
+                <div className="empty-state">
+                  <h3>Start filling the form</h3>
+                  <p>Select options to see calculated prices</p>
+                </div>
+              )}
             </div>
             
             <button 
@@ -457,10 +483,26 @@ const App: React.FC = () => {
             </button>
           </div>
         </div>
-      </div>
-      <VersionInfo />
-    </div>
-  );
-};
+             </div>
+       
+       {/* Плавающая кнопка Reset для мобильной версии */}
+       <button 
+         className="floating-reset-button" 
+         onClick={handleReset}
+         title="Reset all fields"
+       >
+         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+           <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+           <path d="M21 3v5h-5"/>
+           <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+           <path d="M3 21v-5h5"/>
+         </svg>
+         <span>Reset</span>
+       </button>
+       
+       <VersionInfo />
+     </div>
+   );
+ };
 
 export default App;

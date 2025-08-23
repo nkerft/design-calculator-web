@@ -134,7 +134,7 @@ code {
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
 }
 
-/* Кнопка Reset в правой колонке под результатами */
+/* Кнопка Reset внутри results-section */
 .reset-button {
   position: static;
   display: flex;
@@ -151,6 +151,66 @@ code {
   border-radius: 8px;
   transition: all 0.3s ease;
   width: fit-content;
+  margin-top: 20px;
+  align-self: center;
+}
+
+/* Плавающая кнопка Reset для мобильной версии */
+.floating-reset-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(195, 255, 25, 0.1);
+  border: 2px solid rgba(195, 255, 25, 0.3);
+  color: #C3FF19;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 12px 16px;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.floating-reset-button:hover {
+  background: rgba(195, 255, 25, 0.2);
+  border-color: rgba(195, 255, 25, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+}
+
+.floating-reset-button:active {
+  transform: translateY(0);
+}
+
+.floating-reset-button svg {
+  transition: transform 0.3s ease;
+}
+
+.floating-reset-button:hover svg {
+  transform: rotate(180deg);
+}
+
+/* Анимация появления плавающей кнопки */
+@keyframes floatIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.floating-reset-button {
+  animation: floatIn 0.5s ease-out;
 }
 
 .reset-button:hover {
@@ -171,21 +231,13 @@ code {
   transform: rotate(180deg);
 }
 
-.results-column {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  width: 360px;
-  max-width: 360px;
-  flex-shrink: 0;
-}
+/* Удаляем старые стили для results-column, так как изменили структуру */
 
 .results-section {
   position: sticky;
   top: 40px;
-  width: 100%;
-  max-width: 100%;
+  width: 360px;
+  max-width: 360px;
   background: rgba(195, 255, 25, 0.08);
   backdrop-filter: blur(20px);
   border-radius: 20px;
@@ -194,6 +246,9 @@ code {
   animation: slideInUp 1s ease-out 0.7s both;
   z-index: 1;
   transition: all 0.3s ease;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .results-section:hover {
@@ -439,7 +494,12 @@ code {
 
 /* Когда dropdown открыт, увеличиваем z-index */
 .custom-select:has(.custom-select__dropdown) {
-  z-index: 10;
+  z-index: 9999 !important;
+}
+
+/* Предотвращаем наслоение дропдаунов */
+.custom-select:has(.custom-select__dropdown) ~ .custom-select {
+  z-index: 1 !important;
 }
 
 .custom-select__header {
@@ -498,9 +558,9 @@ code {
   border: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   margin-top: 8px;
-  max-height: none;
-  overflow-y: visible;
-  z-index: 100;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 9999 !important;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(20px);
   animation: dropdownSlideIn 0.3s ease-out;
@@ -509,6 +569,8 @@ code {
   background-image: none !important;
   /* Убеждаемся, что dropdown поверх всех элементов формы */
   isolation: isolate;
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 
 @keyframes dropdownSlideIn {
@@ -522,6 +584,13 @@ code {
     transform: translateY(0);
     background: #1a1a1a;
   }
+}
+
+/* Дополнительные стили для обеспечения видимости дропдауна */
+.custom-select__dropdown {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
 }
 
 .custom-select__option {
@@ -540,6 +609,10 @@ code {
   /* Принудительно устанавливаем фон для опций */
   background: transparent !important;
   background-color: transparent !important;
+  /* Убеждаемся, что опции кликабельны */
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 1;
 }
 
 .custom-select__option:hover {
@@ -1079,11 +1152,17 @@ input:checked ~ .toggle-label {
     right: 16px !important;
     max-height: 300px !important;
     overflow-y: auto !important;
+    opacity: 1 !important;
   }
   
   /* На мобильных все dropdown имеют одинаковый z-index */
   .form-group .custom-select {
     z-index: 1 !important;
+  }
+  
+  /* Когда dropdown открыт на мобильных */
+  .form-group .custom-select:has(.custom-select__dropdown) {
+    z-index: 99999 !important;
   }
   
   .form-section {
@@ -1101,6 +1180,8 @@ input:checked ~ .toggle-label {
     order: 2;
     margin-top: 20px;
   }
+  
+  /* Убираем дублирующиеся стили для results-column */
   
   .header h1 {
     font-size: 2.5rem;
@@ -1139,6 +1220,7 @@ input:checked ~ .toggle-label {
   .version-info {
     margin-top: auto;
     padding: 16px 0;
+    margin-bottom: 80px; /* Отступ для плавающей кнопки */
   }
   
   .version-main {
@@ -1149,5 +1231,15 @@ input:checked ~ .toggle-label {
   .version-copyright {
     flex-direction: column;
     gap: 4px;
+  }
+  
+  /* Показываем плавающую кнопку Reset на мобильных */
+  .floating-reset-button {
+    display: flex;
+  }
+  
+  /* Скрываем обычную кнопку Reset на мобильных */
+  .reset-button {
+    display: none;
   }
 }
