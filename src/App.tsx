@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ProjectForm, CalculationResult } from './types';
-import { SOURCE_OPTIONS, WORK_TYPE_OPTIONS, REGION_OPTIONS, URGENCY_DAYS_OPTIONS, getElementsLabel } from './types';
+import { SOURCE_OPTIONS, WORK_TYPE_OPTIONS, REGION_OPTIONS, URGENCY_DAYS_OPTIONS, DISCOUNT_OPTIONS, getElementsLabel } from './types';
 import { calculateProjectCost, formatPriceUSD, formatPriceRUB } from './calculator';
 
 // Custom dropdown component
@@ -233,6 +233,45 @@ const PriceDisplay: React.FC<PriceDisplayProps> = ({ label, price }) => {
   );
 };
 
+// Discount buttons component
+interface DiscountButtonsProps {
+  value: number;
+  onChange: (value: number) => void;
+}
+
+const DiscountButtons: React.FC<DiscountButtonsProps> = ({ value, onChange }) => {
+  return (
+    <div className="form-group">
+      <label className="form-label">Discount</label>
+      <div className="toggle-group">
+        <label className="toggle-switch">
+          <input
+            type="checkbox"
+            checked={value > 0}
+            onChange={(e) => onChange(e.target.checked ? 10 : 0)}
+          />
+          <span className="toggle-slider"></span>
+        </label>
+        <span className="toggle-label">Apply discount</span>
+      </div>
+      
+      {value > 0 && (
+        <div className="discount-buttons">
+          {DISCOUNT_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              className={`discount-button ${value === parseInt(option.value) ? 'discount-button--active' : ''}`}
+              onClick={() => onChange(parseInt(option.value))}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   const [form, setForm] = useState<ProjectForm>({
     source: '',
@@ -240,7 +279,8 @@ const App: React.FC = () => {
     elementsCount: 10,
     isUrgent: false,
     urgencyDays: 0,
-    region: ''
+    region: '',
+    discount: 0
   });
 
   const [results, setResults] = useState<CalculationResult | null>(null);
@@ -267,7 +307,8 @@ const App: React.FC = () => {
       elementsCount: 10,
       isUrgent: false,
       urgencyDays: 0,
-      region: ''
+      region: '',
+      discount: 0
     });
     setResults(null);
   };
@@ -350,8 +391,10 @@ const App: React.FC = () => {
             label="Project Region"
           />
 
-
-
+          <DiscountButtons
+            value={form.discount}
+            onChange={(value) => handleInputChange('discount', value)}
+          />
 
         </div>
 
@@ -367,6 +410,12 @@ const App: React.FC = () => {
                   label="Designer Work Cost" 
                   price={results.designerPrice} 
                 />
+                <div className="estimated-hours">
+                  <span className="estimated-hours-label">Estimated hours:</span>
+                  <span className="estimated-hours-value">
+                    {results.estimatedHours.min}–{results.estimatedHours.max}h
+                  </span>
+                </div>
               </>
             ) : (
               <div className="empty-state">

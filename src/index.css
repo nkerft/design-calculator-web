@@ -830,6 +830,80 @@ input:checked ~ .toggle-label {
   opacity: 0.7;
 }
 
+/* Discount buttons styles */
+.discount-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.discount-button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 60px;
+  text-align: center;
+}
+
+.discount-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.discount-button--active {
+  background: #C3FF19;
+  color: #15191C;
+  border-color: #C3FF19;
+  font-weight: 600;
+}
+
+.discount-button--active:hover {
+  background: #b3e619;
+  border-color: #b3e619;
+  transform: translateY(-1px);
+}
+
+/* Estimated hours styles */
+.estimated-hours {
+  margin-top: 30px;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.estimated-hours:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.estimated-hours-label {
+  font-size: 0.85rem;
+  color: #a0a0a0;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.estimated-hours-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffffff;
+  opacity: 0.8;
+}
+
 @media (max-width: 1200px) {
   .main-content {
     max-width: 1000px;

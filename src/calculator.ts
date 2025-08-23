@@ -2,77 +2,96 @@ import { ProjectForm, CalculationResult } from './types';
 
 // Pricing configuration for different work types
 const PRICING_CONFIG = {
-  presentation: {
+  presentation_design: {
     basePrice: 28,        // Starting price per slide
     minPrice: 7,         // Minimum price per slide
     breakpoint: 150,      // At this quantity, price becomes minimum
-    name: 'slide'
+    name: 'slide',
+    hoursPerUnit: { min: 0.8, max: 1.2 }  // Hours per slide
+  },
+  presentation_format: {
+    basePrice: 14,        // Half price of presentation_design
+    minPrice: 3.5,        // Half minimum price
+    breakpoint: 150,      // At this quantity, price becomes minimum
+    name: 'slide',
+    hoursPerUnit: { min: 0.4, max: 0.6 }  // Half hours of presentation_design
   },
   template: {
     basePrice: 30,        // Starting price per page
     minPrice: 10,         // Minimum price per page
     breakpoint: 100,      // At this quantity, price becomes minimum
-    name: 'page'
+    name: 'page',
+    hoursPerUnit: { min: 1.0, max: 1.5 }
   },
   website_design: {
     basePrice: 200,       // Starting price per screen
     minPrice: 80,         // Minimum price per screen
     breakpoint: 50,       // At this quantity, price becomes minimum
-    name: 'screen'
+    name: 'screen',
+    hoursPerUnit: { min: 4.0, max: 6.0 }
   },
   landing_page: {
     basePrice: 160,       // Starting price per screen
     minPrice: 60,         // Minimum price per screen
     breakpoint: 30,       // At this quantity, price becomes minimum
-    name: 'screen'
+    name: 'screen',
+    hoursPerUnit: { min: 3.0, max: 4.5 }
   },
   logo: {
     basePrice: 110,       // Starting price per option
     minPrice: 40,         // Minimum price per option
     breakpoint: 20,       // At this quantity, price becomes minimum
-    name: 'option'
+    name: 'option',
+    hoursPerUnit: { min: 2.0, max: 3.0 }
   },
   branding: {
     basePrice: 350,       // Starting price per element
     minPrice: 120,        // Minimum price per element
     breakpoint: 25,       // At this quantity, price becomes minimum
-    name: 'element'
+    name: 'element',
+    hoursPerUnit: { min: 6.0, max: 9.0 }
   },
   social_media: {
     basePrice: 40,        // Starting price per post
     minPrice: 15,         // Minimum price per post
     breakpoint: 50,       // At this quantity, price becomes minimum
-    name: 'post'
+    name: 'post',
+    hoursPerUnit: { min: 0.5, max: 0.8 }
   },
   print: {
     basePrice: 55,        // Starting price per item
     minPrice: 20,         // Minimum price per item
     breakpoint: 40,       // At this quantity, price becomes minimum
-    name: 'item'
+    name: 'item',
+    hoursPerUnit: { min: 1.0, max: 1.5 }
   },
   illustration: {
     basePrice: 80,        // Starting price per illustration
     minPrice: 30,         // Minimum price per illustration
     breakpoint: 30,       // At this quantity, price becomes minimum
-    name: 'illustration'
+    name: 'illustration',
+    hoursPerUnit: { min: 2.0, max: 3.0 }
   },
   ui_ux: {
     basePrice: 280,       // Starting price per hour
     minPrice: 100,        // Minimum price per hour
     breakpoint: 40,       // At this quantity, price becomes minimum
-    name: 'hour'
+    name: 'hour',
+    hoursPerUnit: { min: 1.0, max: 1.0 }  // Direct hours
   },
   delegated_support: {
     basePrice: 25,        // Starting price per task
     minPrice: 10,         // Minimum price per task
     breakpoint: 100,      // At this quantity, price becomes minimum
-    name: 'task'
+    name: 'task',
+    hoursPerUnit: { min: 0.3, max: 0.5 }
   },
   web_development: {
     basePrice: 400,       // Starting price per page
     minPrice: 150,        // Minimum price per page
     breakpoint: 20,       // At this quantity, price becomes minimum
-    name: 'page'
+    name: 'page',
+    hoursPerUnit: { min: 8.0, max: 12.0 }
   }
 };
 
@@ -138,20 +157,34 @@ export function calculateProjectCost(form: ProjectForm): CalculationResult | nul
     urgencyMultiplier = URGENCY_MULTIPLIERS[form.urgencyDays as keyof typeof URGENCY_MULTIPLIERS] || 1.0;
   }
 
-  // Calculate final client price
-  const clientPrice = Math.round(
+  // Calculate final client price before discount
+  let clientPrice = Math.round(
     basePrice * 
     sourceMultiplier * 
     urgencyMultiplier * 
     (1 + regionPercentage / 100)
   );
+
+  // Apply discount if selected
+  if (form.discount > 0) {
+    clientPrice = Math.round(clientPrice * (1 - form.discount / 100));
+  }
   
-  // Designer price is 35% of client price
-  const designerPrice = Math.round(clientPrice * 0.35);
+  // Designer price is 35% of client price (before discount)
+  const designerPrice = Math.round(
+    (basePrice * 
+    sourceMultiplier * 
+    urgencyMultiplier * 
+    (1 + regionPercentage / 100)) * 0.35
+  );
+
+  // Calculate estimated hours
+  const estimatedHours = calculateEstimatedHours(form.workType, form.elementsCount);
 
   return {
     clientPrice,
-    designerPrice
+    designerPrice,
+    estimatedHours
   };
 }
 
@@ -175,6 +208,21 @@ function calculateDynamicPrice(workType: string, quantity: number): number {
   }
   
   return Math.round(quantity * pricePerUnit);
+}
+
+// Function to calculate estimated hours based on work type and quantity
+function calculateEstimatedHours(workType: string, quantity: number): { min: number; max: number } {
+  const config = PRICING_CONFIG[workType as keyof typeof PRICING_CONFIG];
+  
+  if (!config || !config.hoursPerUnit) {
+    // Fallback for unknown work types
+    return { min: quantity * 1, max: quantity * 1.5 };
+  }
+  
+  const minHours = Math.round(quantity * config.hoursPerUnit.min * 10) / 10;
+  const maxHours = Math.round(quantity * config.hoursPerUnit.max * 10) / 10;
+  
+  return { min: minHours, max: maxHours };
 }
 
 // Function for formatting price in dollars

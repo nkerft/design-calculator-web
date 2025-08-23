@@ -5,11 +5,16 @@ export interface ProjectForm {
   isUrgent: boolean;
   urgencyDays: number;
   region: string;
+  discount: number;
 }
 
 export interface CalculationResult {
   clientPrice: number;
   designerPrice: number;
+  estimatedHours: {
+    min: number;
+    max: number;
+  };
 }
 
 export interface Option {
@@ -27,7 +32,8 @@ export const SOURCE_OPTIONS: Option[] = [
 ];
 
 export const WORK_TYPE_OPTIONS: Option[] = [
-  { value: 'presentation', label: 'Presentation' },
+  { value: 'presentation_design', label: 'Presentation Design' },
+  { value: 'presentation_format', label: 'Presentation Format' },
   { value: 'template', label: 'Template (Presentation)' },
   { value: 'website_design', label: 'Website Design' },
   { value: 'landing_page', label: 'Landing Page' },
@@ -59,10 +65,17 @@ export const URGENCY_DAYS_OPTIONS: Option[] = [
   { value: '2', label: '2 Days (+30%)' }
 ];
 
+export const DISCOUNT_OPTIONS: Option[] = [
+  { value: '5', label: '5%' },
+  { value: '10', label: '10%' },
+  { value: '15', label: '15%' }
+];
+
 // Function to get dynamic label for elements count based on work type
 export const getElementsLabel = (workType: string): string => {
   switch (workType) {
-    case 'presentation':
+    case 'presentation_design':
+    case 'presentation_format':
       return 'Number of Slides';
     case 'template':
       return 'Number of Pages';
