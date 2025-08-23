@@ -910,15 +910,15 @@ input:checked ~ .toggle-label {
 }
 
 .urgency-button--active {
-  background: #FF8135;
-  color: #ffffff;
-  border-color: #FF8135;
+  background: #C3FF19;
+  color: #15191C;
+  border-color: #C3FF19;
   font-weight: 600;
 }
 
 .urgency-button--active:hover {
-  background: #e6742a;
-  border-color: #e6742a;
+  background: #b3e619;
+  border-color: #b3e619;
   transform: translateY(-1px);
 }
 

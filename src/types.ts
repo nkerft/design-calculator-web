@@ -95,9 +95,8 @@ export const getElementsLabel = (workType: string): string => {
     case 'illustration':
       return 'Number of Illustrations';
     case 'ui_ux':
-      return 'Number of Hours';
     case 'delegated_support':
-      return 'Number of Tasks';
+      return 'Number of Hours';
     case 'logo':
       return 'Number of Options';
     case 'branding':

@@ -80,11 +80,11 @@ const PRICING_CONFIG = {
     hoursPerUnit: { min: 1.0, max: 1.0 }  // Direct hours
   },
   delegated_support: {
-    basePrice: 25,        // Starting price per task
-    minPrice: 10,         // Minimum price per task
-    breakpoint: 100,      // At this quantity, price becomes minimum
-    name: 'task',
-    hoursPerUnit: { min: 0.3, max: 0.5 }
+    basePrice: 280,       // Starting price per hour (same as ui_ux)
+    minPrice: 100,        // Minimum price per hour
+    breakpoint: 40,       // At this quantity, price becomes minimum
+    name: 'hour',
+    hoursPerUnit: { min: 1.0, max: 1.0 }  // Direct hours
   },
   web_development: {
     basePrice: 400,       // Starting price per page
