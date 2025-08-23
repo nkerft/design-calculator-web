@@ -4,8 +4,11 @@
   box-sizing: border-box;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.cdnfonts.com/css/druk-wide-bold');
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -23,14 +26,22 @@ code {
     monospace;
 }
 
+/* Page wrapper for full height layout */
+.page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 .container {
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 40px 20px 40px 20px;
   position: relative;
   animation: fadeIn 0.8s ease-out;
   -webkit-overflow-scrolling: touch;
+  flex: 1;
 }
 
 @keyframes fadeIn {
@@ -46,15 +57,17 @@ code {
 
 .header {
   text-align: center;
-  margin-bottom: 60px;
+  margin-bottom: 80px;
+  margin-top: 40px;
 }
 
 .header h1 {
-  font-size: 3.5rem;
-  font-weight: 800;
+  font-size: 4rem;
+  font-weight: 900;
+  font-family: 'Druk Wide Bold', 'Inter', sans-serif;
   color: #C3FF19;
-  margin-bottom: 16px;
-  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  letter-spacing: -0.03em;
   animation: slideInDown 1s ease-out;
   text-shadow: 0 0 30px rgba(195, 255, 25, 0.3);
 }
@@ -106,7 +119,7 @@ code {
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(20px);
   border-radius: 24px;
-  padding: 48px;
+  padding: 56px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
   animation: slideInUp 1s ease-out 0.5s both;
@@ -121,13 +134,12 @@ code {
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
 }
 
-/* Кнопка Reset в правом верхнем углу */
+/* Кнопка Reset в правой колонке под результатами */
 .reset-button {
-  position: absolute;
-  top: 20px;
-  right: 48px;
+  position: static;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   background: transparent;
   border: none;
@@ -138,7 +150,7 @@ code {
   padding: 8px 12px;
   border-radius: 8px;
   transition: all 0.3s ease;
-  z-index: 20;
+  width: fit-content;
 }
 
 .reset-button:hover {
@@ -159,21 +171,29 @@ code {
   transform: rotate(180deg);
 }
 
+.results-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 360px;
+  max-width: 360px;
+  flex-shrink: 0;
+}
+
 .results-section {
   position: sticky;
   top: 40px;
-  width: 320px;
-  max-width: 320px;
+  width: 100%;
+  max-width: 100%;
   background: rgba(195, 255, 25, 0.08);
   backdrop-filter: blur(20px);
   border-radius: 20px;
   border: 1px solid rgba(195, 255, 25, 0.2);
-  padding: 40px 30px;
+  padding: 48px 36px;
   animation: slideInUp 1s ease-out 0.7s both;
   z-index: 1;
-  align-self: flex-start;
   transition: all 0.3s ease;
-  flex-shrink: 0;
 }
 
 .results-section:hover {
@@ -181,7 +201,7 @@ code {
 }
 
 .form-group {
-  margin-bottom: 32px;
+  margin-bottom: 44px;
   animation: fadeInUp 0.8s ease-out;
   position: relative;
 }
@@ -205,6 +225,11 @@ code {
 .form-group:nth-child(5) { animation-delay: 1.2s; }
 .form-group:nth-child(6) { animation-delay: 1.3s; }
 
+/* Убираем отступ у последнего form-group (Discount) */
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -218,8 +243,9 @@ code {
 
 .form-label {
   display: block;
-  margin-bottom: 12px;
-  font-weight: 600;
+  margin-bottom: 16px;
+  font-weight: 700;
+  font-family: 'Druk Wide Bold', 'Inter', sans-serif;
   color: #ffffff;
   font-size: 0.9rem;
   text-transform: uppercase;
@@ -692,7 +718,7 @@ input:checked ~ .toggle-label {
 }
 
 .result-item {
-  margin-bottom: 40px;
+  margin-bottom: 48px;
   padding: 0;
   background: transparent;
   border: none;
@@ -705,27 +731,37 @@ input:checked ~ .toggle-label {
 }
 
 .result-label {
-  font-weight: 500;
+  font-weight: 700;
+  font-family: 'Druk Wide Bold', 'Inter', sans-serif;
   font-size: 0.85rem;
   color: #ffffff;
-  opacity: 0.7;
+  opacity: 0.8;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 12px;
   display: block;
 }
 
+.result-subtitle {
+  font-size: 0.75rem;
+  color: #a0a0a0;
+  font-weight: 300;
+  margin-bottom: 8px;
+  display: block;
+  font-style: italic;
+}
+
 .result-prices {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
 }
 
 .price-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: 20px 24px;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -740,7 +776,8 @@ input:checked ~ .toggle-label {
 
 .price-value {
   font-size: 1.4rem;
-  font-weight: 700;
+  font-weight: 900;
+  font-family: 'Druk Wide Bold', 'Inter', sans-serif;
   color: #C3FF19;
   animation: pulse 2s infinite;
   text-shadow: 0 0 10px rgba(195, 255, 25, 0.3);
@@ -831,7 +868,7 @@ input:checked ~ .toggle-label {
 /* Discount buttons styles */
 .discount-buttons {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   margin-top: 16px;
   flex-wrap: wrap;
   width: 100%;
@@ -841,7 +878,7 @@ input:checked ~ .toggle-label {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #ffffff;
-  padding: 12px 20px;
+  padding: 16px 24px;
   border-radius: 12px;
   font-size: 1rem;
   font-weight: 500;
@@ -849,7 +886,7 @@ input:checked ~ .toggle-label {
   transition: all 0.3s ease;
   flex: 1;
   min-width: 80px;
-  min-height: 44px;
+  min-height: 52px;
   text-align: center;
   display: flex;
   align-items: center;
@@ -875,11 +912,19 @@ input:checked ~ .toggle-label {
   transform: translateY(-1px);
 }
 
+.discount-note {
+  font-size: 0.7rem;
+  color: #666666;
+  margin-top: 8px;
+  font-style: italic;
+  text-align: center;
+}
+
 /* Urgency buttons styles */
 .urgency-buttons {
   display: flex;
-  gap: 12px;
-  margin-top: 16px;
+  gap: 16px;
+  margin-top: 20px;
   flex-wrap: wrap;
   width: 100%;
 }
@@ -888,7 +933,7 @@ input:checked ~ .toggle-label {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #ffffff;
-  padding: 12px 20px;
+  padding: 16px 24px;
   border-radius: 12px;
   font-size: 1rem;
   font-weight: 500;
@@ -896,7 +941,7 @@ input:checked ~ .toggle-label {
   transition: all 0.3s ease;
   flex: 1;
   min-width: 80px;
-  min-height: 44px;
+  min-height: 52px;
   text-align: center;
   display: flex;
   align-items: center;
@@ -924,8 +969,8 @@ input:checked ~ .toggle-label {
 
 /* Estimated hours styles */
 .estimated-hours {
-  margin-top: 30px;
-  padding: 16px 20px;
+  margin-top: 40px;
+  padding: 20px 24px;
   background: rgba(255, 255, 255, 0.02);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -941,18 +986,58 @@ input:checked ~ .toggle-label {
 }
 
 .estimated-hours-label {
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: #a0a0a0;
   font-weight: 400;
-  text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .estimated-hours-value {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #ffffff;
   opacity: 0.8;
+}
+
+/* Version info styles */
+.version-info {
+  margin-top: 60px;
+  padding: 20px 0;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.version-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.version-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.version-text {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #666666;
+}
+
+.version-copyright {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copyright-text {
+  font-size: 0.65rem;
+  color: #555555;
+  font-weight: 300;
 }
 
 @media (max-width: 1200px) {
@@ -967,13 +1052,14 @@ input:checked ~ .toggle-label {
   }
   
   .results-section {
-    width: 300px;
+    width: 340px;
   }
 }
 
 @media (max-width: 768px) {
   .container {
     padding: 20px 16px;
+    flex: 1;
   }
   
   .main-content {
@@ -1048,5 +1134,20 @@ input:checked ~ .toggle-label {
   
   .number-input-field {
     padding-right: 70px;
+  }
+
+  .version-info {
+    margin-top: auto;
+    padding: 16px 0;
+  }
+  
+  .version-main {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .version-copyright {
+    flex-direction: column;
+    gap: 4px;
   }
 }

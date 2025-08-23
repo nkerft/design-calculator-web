@@ -1,6 +1,6 @@
 {
   "name": "design-calculator",
-  "version": "1.0.0",
+  "version": "1.0.28",
   "homepage": ".",
   "private": true,
   "dependencies": {
@@ -27,7 +27,8 @@
     "eject": "react-scripts eject",
     "build:mobile": "npm run build && npx cap sync",
     "ios": "npx cap open ios",
-    "ios:build": "npm run build:mobile && npx cap build ios"
+    "ios:build": "npm run build:mobile && npx cap build ios",
+    "update-version": "node scripts/update-version.js"
   },
   "eslintConfig": {
     "extends": [

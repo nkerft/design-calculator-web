@@ -1,130 +1,134 @@
 import { ProjectForm, CalculationResult } from './types';
 
-// Pricing configuration for different work types
-const PRICING_CONFIG = {
-  presentation_design: {
-    basePrice: 28,        // Starting price per slide
-    minPrice: 7,         // Minimum price per slide
-    breakpoint: 150,      // At this quantity, price becomes minimum
-    name: 'slide',
-    hoursPerUnit: { min: 0.8, max: 1.2 }  // Hours per slide
+// Configuration object
+const CONFIG = {
+  workTypes: {
+    presentationFormat: { base: 15, min: 5, breakpoint: 150, type_adj_pp: -4 },
+    presentationDesign: { base: 30, min: 10, breakpoint: 150, type_adj_pp: 0 },
+    template: { base: 30, min: 10, breakpoint: 100, type_adj_pp: 0 },
+    website_design: { base: 200, min: 80, breakpoint: 50, type_adj_pp: 0 },
+    landing_page: { base: 160, min: 60, breakpoint: 30, type_adj_pp: 0 },
+    logo: { base: 110, min: 40, breakpoint: 20, type_adj_pp: 0 },
+    branding: { base: 350, min: 120, breakpoint: 25, type_adj_pp: 0 },
+    social_media: { base: 40, min: 15, breakpoint: 50, type_adj_pp: 0 },
+    print: { base: 55, min: 20, breakpoint: 40, type_adj_pp: 0 },
+    illustration: { base: 80, min: 30, breakpoint: 30, type_adj_pp: 0 },
+    ui_ux: { base: 40, min: 25, breakpoint: 80, type_adj_pp: 0 },
+    delegated_support: { base: 40, min: 25, breakpoint: 80, type_adj_pp: 0 },
+    web_development: { base: 400, min: 150, breakpoint: 20, type_adj_pp: 0 }
   },
-  presentation_format: {
-    basePrice: 14,        // Half price of presentation_design
-    minPrice: 3.5,        // Half minimum price
-    breakpoint: 150,      // At this quantity, price becomes minimum
-    name: 'slide',
-    hoursPerUnit: { min: 0.4, max: 0.6 }  // Half hours of presentation_design
+  multipliers: {
+    source: { fiverr: 1.2, upwork: 1.2, freelancer: 1.2, telegram: 1.0, internal: 1.0, other: 1.0 },
+    urgency: { 1: 1.5, 3: 1.3, normal: 1.0 },
+    region: { 
+      north_america: 0.10, europe: 0.0, asia: 0.10, cis: 0.0, 
+      middle_east: 0.07, africa: -0.10, south_america: 0.0, australia_oceania: 0.10 
+    }
   },
-  template: {
-    basePrice: 30,        // Starting price per page
-    minPrice: 10,         // Minimum price per page
-    breakpoint: 100,      // At this quantity, price becomes minimum
-    name: 'page',
-    hoursPerUnit: { min: 1.0, max: 1.5 }
+  designerShare: {
+    base_pp: 34,
+    volume: { from_pp: 1, to_pp: -2, breakpoint: 150 },
+    urgency_adj_pp: { 1: 5, 3: 2, normal: 0 },
+    min_pp: 26,
+    max_pp: 45
   },
-  website_design: {
-    basePrice: 200,       // Starting price per screen
-    minPrice: 80,         // Minimum price per screen
-    breakpoint: 50,       // At this quantity, price becomes minimum
-    name: 'screen',
-    hoursPerUnit: { min: 4.0, max: 6.0 }
-  },
-  landing_page: {
-    basePrice: 160,       // Starting price per screen
-    minPrice: 60,         // Minimum price per screen
-    breakpoint: 30,       // At this quantity, price becomes minimum
-    name: 'screen',
-    hoursPerUnit: { min: 3.0, max: 4.5 }
-  },
-  logo: {
-    basePrice: 110,       // Starting price per option
-    minPrice: 40,         // Minimum price per option
-    breakpoint: 20,       // At this quantity, price becomes minimum
-    name: 'option',
-    hoursPerUnit: { min: 2.0, max: 3.0 }
-  },
-  branding: {
-    basePrice: 350,       // Starting price per element
-    minPrice: 120,        // Minimum price per element
-    breakpoint: 25,       // At this quantity, price becomes minimum
-    name: 'element',
-    hoursPerUnit: { min: 6.0, max: 9.0 }
-  },
-  social_media: {
-    basePrice: 40,        // Starting price per post
-    minPrice: 15,         // Minimum price per post
-    breakpoint: 50,       // At this quantity, price becomes minimum
-    name: 'post',
-    hoursPerUnit: { min: 0.5, max: 0.8 }
-  },
-  print: {
-    basePrice: 55,        // Starting price per item
-    minPrice: 20,         // Minimum price per item
-    breakpoint: 40,       // At this quantity, price becomes minimum
-    name: 'item',
-    hoursPerUnit: { min: 1.0, max: 1.5 }
-  },
-  illustration: {
-    basePrice: 80,        // Starting price per illustration
-    minPrice: 30,         // Minimum price per illustration
-    breakpoint: 30,       // At this quantity, price becomes minimum
-    name: 'illustration',
-    hoursPerUnit: { min: 2.0, max: 3.0 }
-  },
-  ui_ux: {
-    basePrice: 280,       // Starting price per hour
-    minPrice: 100,        // Minimum price per hour
-    breakpoint: 40,       // At this quantity, price becomes minimum
-    name: 'hour',
-    hoursPerUnit: { min: 1.0, max: 1.0 }  // Direct hours
-  },
-  delegated_support: {
-    basePrice: 280,       // Starting price per hour (same as ui_ux)
-    minPrice: 100,        // Minimum price per hour
-    breakpoint: 40,       // At this quantity, price becomes minimum
-    name: 'hour',
-    hoursPerUnit: { min: 1.0, max: 1.0 }  // Direct hours
-  },
-  web_development: {
-    basePrice: 400,       // Starting price per page
-    minPrice: 150,        // Minimum price per page
-    breakpoint: 20,       // At this quantity, price becomes minimum
-    name: 'page',
-    hoursPerUnit: { min: 8.0, max: 12.0 }
-  }
+  discount: { appliesTo: "designer" },
+  rounding: { usd: 1, rub: 10 }
 };
 
-// Region percentage additions (not multipliers)
-const REGION_PERCENTAGES = {
-  north_america: 10,     // North America - +10%
-  europe: 0,             // Europe - +0%
-  asia: 10,              // Asia - +10%
-  middle_east: 7,        // Middle East - +7%
-  africa: -10,           // Africa - -10%
-  south_america: 0,      // South America - +0%
-  australia_oceania: 10, // Australia & Oceania - +10%
-  cis: 0                 // CIS - +0%
-};
-
-// Multipliers for sources (freelance platforms get +20%)
-const SOURCE_MULTIPLIERS = {
-  fiverr: 1.2,      // +20% for freelance platforms
-  upwork: 1.2,      // +20% for freelance platforms
-  freelancer: 1.2,  // +20% for freelance platforms
-  telegram: 1.0,    // No additional cost
-  internal: 1.0,    // No additional cost
-  other: 1.0        // No additional cost
-};
-
-// Urgency multipliers based on days
-const URGENCY_MULTIPLIERS = {
-  1: 1.5,  // 1 day - 50% extra
-  3: 1.3   // 3 days - 30% extra
-};
-
-// Current exchange rate (USD to RUB) - you can update this or fetch from API
+// Current exchange rate (USD to RUB)
 const USD_TO_RUB_RATE = 95.5;
+
+// Utility function to clamp value between min and max
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
+}
+
+// Calculate price per unit using linear model
+function pricePerUnit(n: number, base: number, min: number, breakpoint: number): number {
+  const progress = clamp((n - 1) / breakpoint, 0, 1);
+  return base - (base - min) * progress;
+}
+
+// Calculate base sum for all units
+function calcBaseSum(n: number, workType: string): number {
+  const config = CONFIG.workTypes[workType as keyof typeof CONFIG.workTypes];
+  if (!config) {
+    return n * 30; // fallback
+  }
+  
+  const pricePerUnitValue = pricePerUnit(n, config.base, config.min, config.breakpoint);
+  return pricePerUnitValue * n;
+}
+
+// Calculate project cost for client
+function calcProjectCost(baseSum: number, source: string, urgency: number, region: string): number {
+  const sourceMul = CONFIG.multipliers.source[source as keyof typeof CONFIG.multipliers.source] || 1.0;
+  const urgencyMul = urgency ? CONFIG.multipliers.urgency[urgency as keyof typeof CONFIG.multipliers.urgency] || 1.0 : 1.0;
+  const regionPct = CONFIG.multipliers.region[region as keyof typeof CONFIG.multipliers.region] || 0;
+  
+  return baseSum * sourceMul * urgencyMul * (1 + regionPct);
+}
+
+// Calculate designer share percentage points
+function calcDesignerSharePP(n: number, workType: string, urgency: number): number {
+  const config = CONFIG.workTypes[workType as keyof typeof CONFIG.workTypes];
+  if (!config) {
+    return CONFIG.designerShare.base_pp;
+  }
+  
+  const typeAdjPP = config.type_adj_pp;
+  const volAdjPP = CONFIG.designerShare.volume.from_pp - 
+    (CONFIG.designerShare.volume.from_pp - CONFIG.designerShare.volume.to_pp) * 
+    clamp((n - 1) / CONFIG.designerShare.volume.breakpoint, 0, 1);
+  
+  const urgencyAdjPP = urgency ? 
+    CONFIG.designerShare.urgency_adj_pp[urgency as keyof typeof CONFIG.designerShare.urgency_adj_pp] || 0 : 0;
+  
+  let sharePP = CONFIG.designerShare.base_pp + typeAdjPP + volAdjPP + urgencyAdjPP;
+  return clamp(sharePP, CONFIG.designerShare.min_pp, CONFIG.designerShare.max_pp);
+}
+
+// Calculate designer payment
+function calcDesignerPay(baseSum: number, urgency: number, sharePP: number, discount: number): { gross: number; net: number } {
+  const share = sharePP / 100;
+  const urgencyMul = urgency ? CONFIG.multipliers.urgency[urgency as keyof typeof CONFIG.multipliers.urgency] || 1.0 : 1.0;
+  
+  const gross = baseSum * urgencyMul * share;
+  // Designer gets half the discount
+  const net = gross * (1 - (discount / 2) / 100);
+  
+  return { gross, net };
+}
+
+// Calculate estimated hours
+function calculateEstimatedHours(workType: string, quantity: number): { min: number; max: number } {
+  const hoursConfig = {
+    presentationDesign: { min: 0.8, max: 1.2 },
+    presentationFormat: { min: 0.4, max: 0.6 },
+    template: { min: 1.0, max: 1.5 },
+    website_design: { min: 4.0, max: 6.0 },
+    landing_page: { min: 3.0, max: 4.5 },
+    logo: { min: 2.0, max: 3.0 },
+    branding: { min: 6.0, max: 9.0 },
+    social_media: { min: 0.5, max: 0.8 },
+    print: { min: 1.0, max: 1.5 },
+    illustration: { min: 2.0, max: 3.0 },
+    ui_ux: { min: 1.0, max: 1.0 },
+    delegated_support: { min: 1.0, max: 1.0 },
+    web_development: { min: 8.0, max: 12.0 }
+  };
+  
+  const config = hoursConfig[workType as keyof typeof hoursConfig];
+  if (!config) {
+    return { min: quantity * 1, max: quantity * 1.5 };
+  }
+  
+  const minHours = Math.round(quantity * config.min * 10) / 10;
+  const maxHours = Math.round(quantity * config.max * 10) / 10;
+  
+  return { min: minHours, max: maxHours };
+}
 
 export function calculateProjectCost(form: ProjectForm): CalculationResult | null {
   // Check if we have required fields
@@ -132,97 +136,36 @@ export function calculateProjectCost(form: ProjectForm): CalculationResult | nul
     return null;
   }
 
-  let basePrice = 0;
-
-  // Calculate base price based on work type
-  basePrice = calculateDynamicPrice(form.workType, form.elementsCount);
-
-  // Apply multipliers and additions
-  let sourceMultiplier = 1.0;
-  let urgencyMultiplier = 1.0;
-  let regionPercentage = 0;
-
-  // Region percentage addition
-  if (form.region) {
-    regionPercentage = REGION_PERCENTAGES[form.region as keyof typeof REGION_PERCENTAGES] || 0;
-  }
-
-  // Source multiplier
-  if (form.source) {
-    sourceMultiplier = SOURCE_MULTIPLIERS[form.source as keyof typeof SOURCE_MULTIPLIERS] || 1.0;
-  }
-
-  // Urgency multiplier
-  if (form.isUrgent && form.urgencyDays) {
-    urgencyMultiplier = URGENCY_MULTIPLIERS[form.urgencyDays as keyof typeof URGENCY_MULTIPLIERS] || 1.0;
-  }
-
-  // Calculate final client price before discount
-  let clientPrice = Math.round(
-    basePrice * 
-    sourceMultiplier * 
-    urgencyMultiplier * 
-    (1 + regionPercentage / 100)
-  );
-
-  // Apply discount if selected
-  if (form.discount > 0) {
-    clientPrice = Math.round(clientPrice * (1 - form.discount / 100));
-  }
+  // Calculate base sum
+  const baseSum = calcBaseSum(form.elementsCount, form.workType);
   
-  // Designer price is 35% of client price (before discount)
-  const designerPrice = Math.round(
-    (basePrice * 
-    sourceMultiplier * 
-    urgencyMultiplier * 
-    (1 + regionPercentage / 100)) * 0.35
+  // Calculate project cost for client (before discount)
+  const clientPriceBeforeDiscount = calcProjectCost(baseSum, form.source, form.urgencyDays, form.region);
+  
+  // Apply discount to client price
+  const clientPrice = form.discount > 0 ? 
+    clientPriceBeforeDiscount * (1 - form.discount / 100) : 
+    clientPriceBeforeDiscount;
+  
+  // Calculate designer share percentage
+  const designerSharePP = calcDesignerSharePP(form.elementsCount, form.workType, form.urgencyDays);
+  
+  // Calculate designer payment
+  const { net: designerNet } = calcDesignerPay(
+    baseSum, 
+    form.urgencyDays, 
+    designerSharePP, 
+    form.discount
   );
-
+  
   // Calculate estimated hours
   const estimatedHours = calculateEstimatedHours(form.workType, form.elementsCount);
 
   return {
-    clientPrice,
-    designerPrice,
+    clientPrice: Math.round(clientPrice),
+    designerPrice: Math.round(designerNet),
     estimatedHours
   };
-}
-
-// Function to calculate dynamic price based on quantity
-function calculateDynamicPrice(workType: string, quantity: number): number {
-  const config = PRICING_CONFIG[workType as keyof typeof PRICING_CONFIG];
-  
-  if (!config) {
-    // Fallback for unknown work types
-    return quantity * 30;
-  }
-  
-  // Calculate price per unit using smooth decrease
-  let pricePerUnit = config.basePrice;
-  
-  if (quantity > 1) {
-    // Calculate the reduction factor based on quantity
-    const reductionFactor = Math.min(quantity / config.breakpoint, 1);
-    const priceReduction = (config.basePrice - config.minPrice) * reductionFactor;
-    pricePerUnit = config.basePrice - priceReduction;
-  }
-  
-  return Math.round(quantity * pricePerUnit);
-}
-
-// Function to calculate estimated hours based on work type and quantity
-function calculateEstimatedHours(workType: string, quantity: number): { min: number; max: number } {
-  const config = PRICING_CONFIG[workType as keyof typeof PRICING_CONFIG];
-  
-  if (!config || !config.hoursPerUnit) {
-    // Fallback for unknown work types
-    return { min: quantity * 1, max: quantity * 1.5 };
-  }
-  
-  const minHours = Math.round(quantity * config.hoursPerUnit.min * 10) / 10;
-  const maxHours = Math.round(quantity * config.hoursPerUnit.max * 10) / 10;
-  
-  return { min: minHours, max: maxHours };
 }
 
 // Function for formatting price in dollars
@@ -237,7 +180,7 @@ export function formatPriceUSD(price: number): string {
 
 // Function for formatting price in rubles
 export function formatPriceRUB(price: number): string {
-  const rubPrice = Math.round(price * USD_TO_RUB_RATE);
+  const rubPrice = Math.round(price * USD_TO_RUB_RATE / 10) * 10; // Round to nearest 10 RUB
   return new Intl.NumberFormat('ru-RU', {
     style: 'currency',
     currency: 'RUB',

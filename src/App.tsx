@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ProjectForm, CalculationResult } from './types';
 import { SOURCE_OPTIONS, WORK_TYPE_OPTIONS, REGION_OPTIONS, URGENCY_BUTTON_OPTIONS, DISCOUNT_OPTIONS, getElementsLabel } from './types';
 import { calculateProjectCost, formatPriceUSD, formatPriceRUB } from './calculator';
+import VersionInfo from './components/VersionInfo';
 
 // Custom dropdown component
 interface CustomSelectProps {
@@ -170,9 +171,10 @@ const NumberInput: React.FC<{ value: number; onChange: (value: number) => void; 
 interface PriceDisplayProps {
   label: string;
   price: number;
+  subtitle?: string;
 }
 
-const PriceDisplay: React.FC<PriceDisplayProps> = ({ label, price }) => {
+const PriceDisplay: React.FC<PriceDisplayProps> = ({ label, price, subtitle }) => {
   const [copied, setCopied] = useState(false);
   const [copyType, setCopyType] = useState<'usd' | 'rub' | null>(null);
 
@@ -193,6 +195,7 @@ const PriceDisplay: React.FC<PriceDisplayProps> = ({ label, price }) => {
   return (
     <div className="result-item">
       <span className="result-label">{label}</span>
+      {subtitle && <span className="result-subtitle">{subtitle}</span>}
       <div className="result-prices">
         <div className="price-item">
           <span className="price-value">{formatPriceUSD(price)}</span>
@@ -309,6 +312,7 @@ const DiscountButtons: React.FC<DiscountButtonsProps> = ({ value, onChange }) =>
           ))}
         </div>
       )}
+
     </div>
   );
 };
@@ -355,100 +359,106 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="container">
-      <div className="header">
-        <h1>Design Calculator</h1>
-        <p>Project cost calculator for WeTrio coordinators</p>
-      </div>
-
-      <div className="main-content">
-        <div className="form-section">
-          <button 
-            className="reset-button" 
-            onClick={handleReset}
-            title="Reset all fields"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-              <path d="M21 3v5h-5"/>
-              <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-              <path d="M3 21v-5h5"/>
-            </svg>
-            <span>Reset</span>
-          </button>
-          
-          <CustomSelect
-            value={form.source}
-            onChange={(value) => handleInputChange('source', value)}
-            options={SOURCE_OPTIONS}
-            placeholder="Select source"
-            label="Work Source"
-          />
-
-          <CustomSelect
-            value={form.workType}
-            onChange={(value) => handleInputChange('workType', value)}
-            options={WORK_TYPE_OPTIONS}
-            placeholder="Select work type"
-            label="Work Type"
-          />
-
-          <NumberInput
-            value={form.elementsCount}
-            onChange={(value) => handleInputChange('elementsCount', value)}
-            label={getElementsLabel(form.workType)}
-          />
-
-          <UrgencyButtons
-            isUrgent={form.isUrgent}
-            urgencyDays={form.urgencyDays}
-            onUrgentChange={(isUrgent) => handleInputChange('isUrgent', isUrgent)}
-            onUrgencyDaysChange={(days) => handleInputChange('urgencyDays', days)}
-          />
-
-          <CustomSelect
-            value={form.region}
-            onChange={(value) => handleInputChange('region', value)}
-            options={REGION_OPTIONS}
-            placeholder="Select region"
-            label="Project Region"
-          />
-
-          <DiscountButtons
-            value={form.discount}
-            onChange={(value) => handleInputChange('discount', value)}
-          />
-
+    <div className="page-wrapper">
+      <div className="container">
+        <div className="header">
+          <h1>Design Calculator</h1>
+          <p>Project cost calculator for WeTrio coordinators</p>
         </div>
 
-        <div className="results-section">
-          <div className="results">
-            {results ? (
-              <>
-                <PriceDisplay 
-                  label="Project Cost for WeTrio" 
-                  price={results.clientPrice} 
-                />
-                <PriceDisplay 
-                  label="Designer Work Cost" 
-                  price={results.designerPrice} 
-                />
-                <div className="estimated-hours">
-                  <span className="estimated-hours-label">Estimated hours:</span>
-                  <span className="estimated-hours-value">
-                    {results.estimatedHours.min}–{results.estimatedHours.max}h
-                  </span>
-                </div>
-              </>
-            ) : (
-              <div className="empty-state">
-                <h3>Start filling the form</h3>
-                <p>Select options to see calculated prices</p>
+        <div className="main-content">
+          <div className="form-section">
+            
+            <CustomSelect
+              value={form.source}
+              onChange={(value) => handleInputChange('source', value)}
+              options={SOURCE_OPTIONS}
+              placeholder="Select source"
+              label="Work Source"
+            />
+
+            <CustomSelect
+              value={form.workType}
+              onChange={(value) => handleInputChange('workType', value)}
+              options={WORK_TYPE_OPTIONS}
+              placeholder="Select work type"
+              label="Work Type"
+            />
+
+            <NumberInput
+              value={form.elementsCount}
+              onChange={(value) => handleInputChange('elementsCount', value)}
+              label={getElementsLabel(form.workType)}
+            />
+
+            <UrgencyButtons
+              isUrgent={form.isUrgent}
+              urgencyDays={form.urgencyDays}
+              onUrgentChange={(isUrgent) => handleInputChange('isUrgent', isUrgent)}
+              onUrgencyDaysChange={(days) => handleInputChange('urgencyDays', days)}
+            />
+
+            <CustomSelect
+              value={form.region}
+              onChange={(value) => handleInputChange('region', value)}
+              options={REGION_OPTIONS}
+              placeholder="Select region"
+              label="Project Region"
+            />
+
+            <DiscountButtons
+              value={form.discount}
+              onChange={(value) => handleInputChange('discount', value)}
+            />
+
+          </div>
+
+          <div className="results-column">
+            <div className="results-section">
+              <div className="results">
+                {results ? (
+                  <>
+                    <PriceDisplay 
+                      label="Project Cost for WeTrio" 
+                      price={results.clientPrice} 
+                    />
+                    <PriceDisplay 
+                      label="Designer Work Cost" 
+                      price={results.designerPrice}
+                    />
+                    <div className="estimated-hours">
+                      <span className="estimated-hours-label">Estimated hours:</span>
+                      <span className="estimated-hours-value">
+                        {results.estimatedHours.min}–{results.estimatedHours.max}h
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="empty-state">
+                    <h3>Start filling the form</h3>
+                    <p>Select options to see calculated prices</p>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
+            
+            <button 
+              className="reset-button" 
+              onClick={handleReset}
+              title="Reset all fields"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                <path d="M21 3v5h-5"/>
+                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                <path d="M3 21v-5h5"/>
+              </svg>
+              <span>Reset</span>
+            </button>
           </div>
         </div>
       </div>
+      <VersionInfo />
     </div>
   );
 };

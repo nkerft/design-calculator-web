@@ -32,8 +32,8 @@ export const SOURCE_OPTIONS: Option[] = [
 ];
 
 export const WORK_TYPE_OPTIONS: Option[] = [
-  { value: 'presentation_design', label: 'Presentation Design' },
   { value: 'presentation_format', label: 'Presentation Format' },
+  { value: 'presentation_design', label: 'Presentation Design' },
   { value: 'template', label: 'Template (Presentation)' },
   { value: 'website_design', label: 'Website Design' },
   { value: 'landing_page', label: 'Landing Page' },
@@ -79,8 +79,8 @@ export const DISCOUNT_OPTIONS: Option[] = [
 // Function to get dynamic label for elements count based on work type
 export const getElementsLabel = (workType: string): string => {
   switch (workType) {
-    case 'presentation_design':
-    case 'presentation_format':
+    case 'presentationDesign':
+    case 'presentationFormat':
       return 'Number of Slides';
     case 'template':
       return 'Number of Pages';
