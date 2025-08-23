@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ProjectForm, CalculationResult } from './types';
-import { SOURCE_OPTIONS, WORK_TYPE_OPTIONS, REGION_OPTIONS, URGENCY_DAYS_OPTIONS, DISCOUNT_OPTIONS, getElementsLabel } from './types';
+import { SOURCE_OPTIONS, WORK_TYPE_OPTIONS, REGION_OPTIONS, URGENCY_BUTTON_OPTIONS, DISCOUNT_OPTIONS, getElementsLabel } from './types';
 import { calculateProjectCost, formatPriceUSD, formatPriceRUB } from './calculator';
 
 // Custom dropdown component
@@ -233,6 +233,47 @@ const PriceDisplay: React.FC<PriceDisplayProps> = ({ label, price }) => {
   );
 };
 
+// Urgency buttons component
+interface UrgencyButtonsProps {
+  isUrgent: boolean;
+  urgencyDays: number;
+  onUrgentChange: (isUrgent: boolean) => void;
+  onUrgencyDaysChange: (days: number) => void;
+}
+
+const UrgencyButtons: React.FC<UrgencyButtonsProps> = ({ isUrgent, urgencyDays, onUrgentChange, onUrgencyDaysChange }) => {
+  return (
+    <div className="form-group">
+      <label className="form-label">Project Urgency</label>
+      <div className="toggle-group">
+        <label className="toggle-switch">
+          <input
+            type="checkbox"
+            checked={isUrgent}
+            onChange={(e) => onUrgentChange(e.target.checked)}
+          />
+          <span className="toggle-slider"></span>
+        </label>
+        <span className="toggle-label">Urgent project</span>
+      </div>
+      
+      {isUrgent && (
+        <div className="urgency-buttons">
+          {URGENCY_BUTTON_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              className={`urgency-button ${urgencyDays === parseInt(option.value) ? 'urgency-button--active' : ''}`}
+              onClick={() => onUrgencyDaysChange(parseInt(option.value))}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Discount buttons component
 interface DiscountButtonsProps {
   value: number;
@@ -358,30 +399,12 @@ const App: React.FC = () => {
             label={getElementsLabel(form.workType)}
           />
 
-          <div className="form-group">
-            <label className="form-label">Project Urgency</label>
-            <div className="toggle-group">
-              <label className="toggle-switch">
-                <input
-                  type="checkbox"
-                  checked={form.isUrgent}
-                  onChange={(e) => handleInputChange('isUrgent', e.target.checked)}
-                />
-                <span className="toggle-slider"></span>
-              </label>
-              <span className="toggle-label">Urgent project</span>
-            </div>
-          </div>
-
-          {form.isUrgent && (
-            <CustomSelect
-              value={form.urgencyDays.toString()}
-              onChange={(value) => handleInputChange('urgencyDays', parseInt(value))}
-              options={URGENCY_DAYS_OPTIONS}
-              placeholder="Select urgency level"
-              label="Urgency Level"
-            />
-          )}
+          <UrgencyButtons
+            isUrgent={form.isUrgent}
+            urgencyDays={form.urgencyDays}
+            onUrgentChange={(isUrgent) => handleInputChange('isUrgent', isUrgent)}
+            onUrgencyDaysChange={(days) => handleInputChange('urgencyDays', days)}
+          />
 
           <CustomSelect
             value={form.region}

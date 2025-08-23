@@ -169,7 +169,6 @@ code {
   border-radius: 20px;
   border: 1px solid rgba(195, 255, 25, 0.2);
   padding: 40px 30px;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
   animation: slideInUp 1s ease-out 0.7s both;
   z-index: 1;
   align-self: flex-start;
@@ -179,7 +178,6 @@ code {
 
 .results-section:hover {
   border-color: rgba(195, 255, 25, 0.3);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
 }
 
 .form-group {
@@ -833,23 +831,29 @@ input:checked ~ .toggle-label {
 /* Discount buttons styles */
 .discount-buttons {
   display: flex;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 12px;
+  margin-top: 16px;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .discount-button {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #ffffff;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 0.9rem;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  min-width: 60px;
+  flex: 1;
+  min-width: 80px;
+  min-height: 44px;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .discount-button:hover {
@@ -868,6 +872,53 @@ input:checked ~ .toggle-label {
 .discount-button--active:hover {
   background: #b3e619;
   border-color: #b3e619;
+  transform: translateY(-1px);
+}
+
+/* Urgency buttons styles */
+.urgency-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.urgency-button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+  min-width: 80px;
+  min-height: 44px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.urgency-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.urgency-button--active {
+  background: #FF8135;
+  color: #ffffff;
+  border-color: #FF8135;
+  font-weight: 600;
+}
+
+.urgency-button--active:hover {
+  background: #e6742a;
+  border-color: #e6742a;
   transform: translateY(-1px);
 }
 

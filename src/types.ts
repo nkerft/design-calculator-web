@@ -62,7 +62,12 @@ export const REGION_OPTIONS: Option[] = [
 
 export const URGENCY_DAYS_OPTIONS: Option[] = [
   { value: '1', label: '1 Day (+50%)' },
-  { value: '2', label: '2 Days (+30%)' }
+  { value: '3', label: '3 Days (+30%)' }
+];
+
+export const URGENCY_BUTTON_OPTIONS: Option[] = [
+  { value: '1', label: '1 Day (+50%)' },
+  { value: '3', label: '3 Days (+30%)' }
 ];
 
 export const DISCOUNT_OPTIONS: Option[] = [

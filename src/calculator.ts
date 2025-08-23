@@ -120,7 +120,7 @@ const SOURCE_MULTIPLIERS = {
 // Urgency multipliers based on days
 const URGENCY_MULTIPLIERS = {
   1: 1.5,  // 1 day - 50% extra
-  2: 1.3   // 2 days - 30% extra
+  3: 1.3   // 3 days - 30% extra
 };
 
 // Current exchange rate (USD to RUB) - you can update this or fetch from API
