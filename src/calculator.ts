@@ -17,7 +17,7 @@ const CONFIG = {
     web_development: { base: 13.33, min: 5.0, breakpoint: 20, type_adj_pp: 0 } // 13.33 hours per screen
   },
   multipliers: {
-    source: { fiverr: 1.2, upwork: 1.2, freelancer: 1.2, telegram: 1.0 },
+    source: { fiverr: 1.0, upwork: 1.0, freelancer: 1.0, telegram: 0.8 },
     urgency: { 1: 1.5, 3: 1.3, normal: 1.0 },
     region: { 
       north_america: 0.10, europe: 0.0, asia: 0.10, cis: 0.0, 

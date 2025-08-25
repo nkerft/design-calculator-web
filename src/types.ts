@@ -24,10 +24,10 @@ export interface Option {
 }
 
 export const SOURCE_OPTIONS: Option[] = [
-  { value: 'fiverr', label: 'Fiverr (+20%)' },
-  { value: 'upwork', label: 'Upwork (+20%)' },
-  { value: 'freelancer', label: 'Freelancer (+20%)' },
-  { value: 'telegram', label: 'Telegram' }
+  { value: 'fiverr', label: 'Fiverr' },
+  { value: 'upwork', label: 'Upwork' },
+  { value: 'freelancer', label: 'Freelancer' },
+  { value: 'telegram', label: 'Telegram (-20%)' }
 ];
 
 export const WORK_TYPE_OPTIONS: Option[] = [
