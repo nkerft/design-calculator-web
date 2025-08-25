@@ -3,22 +3,21 @@ import { ProjectForm, CalculationResult } from './types';
 // Configuration object
 const CONFIG = {
   workTypes: {
-    presentation_format: { base: 15, min: 5, breakpoint: 150, type_adj_pp: -4 },
-    presentation_design: { base: 30, min: 10, breakpoint: 150, type_adj_pp: 0 },
-    template: { base: 200, min: 30, breakpoint: 1, type_adj_pp: 0 },
-    website_design: { base: 200, min: 80, breakpoint: 50, type_adj_pp: 0 },
-    landing_page: { base: 160, min: 60, breakpoint: 30, type_adj_pp: 0 },
-    logo: { base: 110, min: 40, breakpoint: 20, type_adj_pp: 0 },
-    branding: { base: 350, min: 120, breakpoint: 25, type_adj_pp: 0 },
-    social_media: { base: 40, min: 15, breakpoint: 50, type_adj_pp: 0 },
-    print: { base: 55, min: 20, breakpoint: 40, type_adj_pp: 0 },
-    illustration: { base: 80, min: 30, breakpoint: 30, type_adj_pp: 0 },
-    ui_ux: { base: 40, min: 25, breakpoint: 80, type_adj_pp: 0 },
-    delegated_support: { base: 40, min: 25, breakpoint: 80, type_adj_pp: 0 },
-    web_development: { base: 400, min: 150, breakpoint: 20, type_adj_pp: 0 }
+    presentation_format: { base: 0.5, min: 0.17, breakpoint: 150, type_adj_pp: -4 }, // 0.5 hours per page
+    presentation_design: { base: 1.0, min: 0.33, breakpoint: 150, type_adj_pp: 0 }, // 1 hour per page
+    template: { base: 6.67, min: 1.0, breakpoint: 1, type_adj_pp: 0 }, // 6.67 hours for 5 pages
+    website_design: { base: 6.67, min: 2.67, breakpoint: 50, type_adj_pp: 0 }, // 6.67 hours per screen
+    landing_page: { base: 5.33, min: 2.0, breakpoint: 30, type_adj_pp: 0 }, // 5.33 hours per screen
+    logo: { base: 3.67, min: 1.33, breakpoint: 20, type_adj_pp: 0 }, // 3.67 hours per option
+    branding: { base: 11.67, min: 4.0, breakpoint: 25, type_adj_pp: 0 }, // 11.67 hours per element
+    social_media: { base: 1.33, min: 0.5, breakpoint: 50, type_adj_pp: 0 }, // 1.33 hours per post
+    print: { base: 1.83, min: 0.67, breakpoint: 40, type_adj_pp: 0 }, // 1.83 hours per item
+    illustration: { base: 2.67, min: 1.0, breakpoint: 30, type_adj_pp: 0 }, // 2.67 hours per illustration
+    hourly_rate: { base: 1.0, min: 0.83, breakpoint: 80, type_adj_pp: 0 }, // 1 hour per hour
+    web_development: { base: 13.33, min: 5.0, breakpoint: 20, type_adj_pp: 0 } // 13.33 hours per screen
   },
   multipliers: {
-    source: { fiverr: 1.2, upwork: 1.2, freelancer: 1.2, telegram: 1.0, internal: 1.0, other: 1.0 },
+    source: { fiverr: 1.2, upwork: 1.2, freelancer: 1.2, telegram: 1.0 },
     urgency: { 1: 1.5, 3: 1.3, normal: 1.0 },
     region: { 
       north_america: 0.10, europe: 0.0, asia: 0.10, cis: 0.0, 
@@ -53,29 +52,71 @@ function pricePerUnit(n: number, base: number, min: number, breakpoint: number):
 }
 
 // Calculate base sum for all units
-function calcBaseSum(n: number, workType: string): number {
+function calcBaseSum(n: number, workType: string, hourlyRate: number): number {
   const config = CONFIG.workTypes[workType as keyof typeof CONFIG.workTypes];
   if (!config) {
-    return n * 30; // fallback
+    return n * hourlyRate; // fallback
   }
   
   // Special logic for template
   if (workType === 'template') {
     if (n <= 5) {
-      console.log(`calcBaseSum: workType=${workType}, n=${n}, template logic: 5 pages = $200, total=$200`);
-      return 200; // Fixed price for 5 pages or less
+      const hours = 6.67; // Fixed hours for 5 pages
+      const totalCost = hours * hourlyRate;
+      console.log(`calcBaseSum: workType=${workType}, n=${n}, template logic: 5 pages = ${hours}h × $${hourlyRate}/h = $${totalCost}`);
+      return totalCost;
     } else {
+      const baseHours = 6.67; // Hours for first 5 pages
       const additionalPages = n - 5;
-      const additionalCost = additionalPages * 30;
-      const totalCost = 200 + additionalCost;
-      console.log(`calcBaseSum: workType=${workType}, n=${n}, template logic: 5 pages = $200 + ${additionalPages} additional pages × $30 = $${totalCost}`);
+      const additionalHours = additionalPages * 1.0; // 1 hour per additional page
+      const totalHours = baseHours + additionalHours;
+      const totalCost = totalHours * hourlyRate;
+      console.log(`calcBaseSum: workType=${workType}, n=${n}, template logic: ${baseHours}h for 5 pages + ${additionalHours}h for ${additionalPages} additional pages = ${totalHours}h × $${hourlyRate}/h = $${totalCost}`);
       return totalCost;
     }
   }
   
-  const pricePerUnitValue = pricePerUnit(n, config.base, config.min, config.breakpoint);
-  console.log(`calcBaseSum: workType=${workType}, n=${n}, base=${config.base}, min=${config.min}, pricePerUnit=${pricePerUnitValue}, total=${pricePerUnitValue * n}`);
-  return pricePerUnitValue * n;
+  // Special logic for logo
+  if (workType === 'logo') {
+    if (n <= 3) {
+      const hours = 6.67; // 6.67 hours for 3 options (200/30 = 6.67 hours)
+      const totalCost = hours * hourlyRate;
+      console.log(`calcBaseSum: workType=${workType}, n=${n}, logo logic: 3 options = ${hours}h × $${hourlyRate}/h = $${totalCost}`);
+      return totalCost;
+    } else {
+      const baseHours = 6.67; // Hours for first 3 options
+      const additionalOptions = n - 3;
+      const additionalHours = additionalOptions * 1.0; // 1 hour per additional option (30/30 = 1 hour)
+      const totalHours = baseHours + additionalHours;
+      const totalCost = totalHours * hourlyRate;
+      console.log(`calcBaseSum: workType=${workType}, n=${n}, logo logic: ${baseHours}h for 3 options + ${additionalHours}h for ${additionalOptions} additional options = ${totalHours}h × $${hourlyRate}/h = $${totalCost}`);
+      return totalCost;
+    }
+  }
+  
+  // Special logic for landing page
+  if (workType === 'landing_page') {
+    if (n <= 1) {
+      const hours = 10.0; // 10 hours for 1 screen (300/30 = 10 hours)
+      const totalCost = hours * hourlyRate;
+      console.log(`calcBaseSum: workType=${workType}, n=${n}, landing page logic: 1 screen = ${hours}h × $${hourlyRate}/h = $${totalCost}`);
+      return totalCost;
+    } else {
+      const baseHours = 10.0; // Hours for first screen
+      const additionalScreens = n - 1;
+      const additionalHours = additionalScreens * 5.33; // 5.33 hours per additional screen
+      const totalHours = baseHours + additionalHours;
+      const totalCost = totalHours * hourlyRate;
+      console.log(`calcBaseSum: workType=${workType}, n=${n}, landing page logic: ${baseHours}h for 1 screen + ${additionalHours}h for ${additionalScreens} additional screens = ${totalHours}h × $${hourlyRate}/h = $${totalCost}`);
+      return totalCost;
+    }
+  }
+  
+  const hoursPerUnit = pricePerUnit(n, config.base, config.min, config.breakpoint);
+  const totalHours = hoursPerUnit * n;
+  const totalCost = totalHours * hourlyRate;
+  console.log(`calcBaseSum: workType=${workType}, n=${n}, base=${config.base}h, min=${config.min}h, hoursPerUnit=${hoursPerUnit}h, totalHours=${totalHours}h, hourlyRate=$${hourlyRate}/h, total=$${totalCost}`);
+  return totalCost;
 }
 
 // Calculate project cost for client
@@ -121,43 +162,42 @@ function calcDesignerPay(baseSum: number, urgency: number, sharePP: number, disc
 // Calculate estimated hours
 function calculateEstimatedHours(workType: string, quantity: number): { min: number; max: number } {
   const hoursConfig = {
-    presentation_design: { min: 0.8, max: 1.2 },
-    presentation_format: { min: 0.4, max: 0.6 },
-    template: { min: 1.0, max: 1.5 },
-    website_design: { min: 4.0, max: 6.0 },
-    landing_page: { min: 3.0, max: 4.5 },
-    logo: { min: 2.0, max: 3.0 },
-    branding: { min: 6.0, max: 9.0 },
-    social_media: { min: 0.5, max: 0.8 },
-    print: { min: 1.0, max: 1.5 },
-    illustration: { min: 2.0, max: 3.0 },
-    ui_ux: { min: 1.0, max: 1.0 },
-    delegated_support: { min: 1.0, max: 1.0 },
-    web_development: { min: 8.0, max: 12.0 }
+    presentation_design: { min: 1.0, max: 1.0 }, // 1 hour per page
+    presentation_format: { min: 0.5, max: 0.5 }, // 0.5 hours per page
+    template: { min: 1.33, max: 1.33 }, // 1.33 hours per page (6.67/5)
+    website_design: { min: 6.67, max: 6.67 }, // 6.67 hours per screen
+    landing_page: { min: 10.0, max: 10.0 }, // 10 hours for 1 screen (300/30 = 10 hours)
+    logo: { min: 2.22, max: 2.22 }, // 2.22 hours per option (6.67 hours for 3 options)
+    branding: { min: 11.67, max: 11.67 }, // 11.67 hours per element
+    social_media: { min: 1.33, max: 1.33 }, // 1.33 hours per post
+    print: { min: 1.83, max: 1.83 }, // 1.83 hours per item
+    illustration: { min: 2.67, max: 2.67 }, // 2.67 hours per illustration
+    hourly_rate: { min: 1.0, max: 1.0 }, // 1 hour per hour
+    web_development: { min: 13.33, max: 13.33 } // 13.33 hours per screen
   };
   
   const config = hoursConfig[workType as keyof typeof hoursConfig];
   if (!config) {
-    return { min: quantity * 1, max: quantity * 1.5 };
+    return { min: Math.round(quantity * 1), max: Math.round(quantity * 1) };
   }
   
-  const minHours = Math.round(quantity * config.min * 10) / 10;
-  const maxHours = Math.round(quantity * config.max * 10) / 10;
+  const minHours = Math.round(quantity * config.min);
+  const maxHours = Math.round(quantity * config.max);
   
   return { min: minHours, max: maxHours };
 }
 
 export function calculateProjectCost(form: ProjectForm): CalculationResult | null {
   // Check if we have required fields
-  if (!form.workType || !form.elementsCount) {
+  if (!form.workType || !form.elementsCount || !form.hourlyRate) {
     return null;
   }
 
   console.log(`=== DEBUG START ===`);
-  console.log(`calculateProjectCost: workType=${form.workType}, elementsCount=${form.elementsCount}`);
+  console.log(`calculateProjectCost: workType=${form.workType}, elementsCount=${form.elementsCount}, hourlyRate=$${form.hourlyRate}/h`);
   
   // Calculate base sum
-  const baseSum = calcBaseSum(form.elementsCount, form.workType);
+  const baseSum = calcBaseSum(form.elementsCount, form.workType, form.hourlyRate);
   
   // Calculate project cost for client (before discount)
   const clientPriceBeforeDiscount = calcProjectCost(baseSum, form.source, form.urgencyDays, form.region);

@@ -35,7 +35,12 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ value, onChange, options, p
   }, []);
 
   const handleSelect = (optionValue: string) => {
-    onChange(optionValue);
+    // Если нажимаем на уже выбранный элемент, сбрасываем значение
+    if (value === optionValue) {
+      onChange('');
+    } else {
+      onChange(optionValue);
+    }
     setIsOpen(false);
   };
 
@@ -92,6 +97,7 @@ const NumberInput: React.FC<{ value: number; onChange: (value: number) => void; 
   // Determine minimum value based on work type
   const getMinValue = () => {
     if (workType === 'template') return 5;
+    if (workType === 'logo') return 3;
     return 1;
   };
 
@@ -327,6 +333,7 @@ const DiscountButtons: React.FC<DiscountButtonsProps> = ({ value, onChange }) =>
 
 const App: React.FC = () => {
   const [form, setForm] = useState<ProjectForm>({
+    hourlyRate: 30,
     source: '',
     workType: '',
     elementsCount: 10,
@@ -337,6 +344,30 @@ const App: React.FC = () => {
   });
 
   const [results, setResults] = useState<CalculationResult | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Эффект для загрузки страницы
+  useEffect(() => {
+    // Принудительно прокручиваем страницу в начало
+    window.scrollTo(0, 0);
+    
+    // Добавляем класс loading к body
+    document.body.classList.add('loading');
+    
+         // Скрываем экран загрузки через 1.5 секунды
+     const timer = setTimeout(() => {
+       setIsLoading(false);
+       // Убираем класс loading с body
+       document.body.classList.remove('loading');
+       // Еще раз убеждаемся, что страница в начале
+       window.scrollTo(0, 0);
+     }, 1500);
+
+    return () => {
+      clearTimeout(timer);
+      document.body.classList.remove('loading');
+    };
+  }, []);
 
   // Calculate results after any field change
   useEffect(() => {
@@ -348,18 +379,30 @@ const App: React.FC = () => {
   useEffect(() => {
     if (form.workType === 'template' && form.elementsCount < 5) {
       setForm(prev => ({ ...prev, elementsCount: 5 }));
-    } else if (form.workType !== 'template' && form.elementsCount < 1) {
+    } else if (form.workType === 'logo' && form.elementsCount < 3) {
+      setForm(prev => ({ ...prev, elementsCount: 3 }));
+    } else if (form.workType !== 'template' && form.workType !== 'logo' && form.elementsCount < 1) {
       setForm(prev => ({ ...prev, elementsCount: 1 }));
     }
-  }, [form.workType]);
+  }, [form.workType, form.elementsCount]);
 
 
 
   const handleInputChange = (field: keyof ProjectForm, value: string | number | boolean) => {
-    setForm(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setForm(prev => {
+      // Если отключаем Project Urgency, сбрасываем urgencyDays
+      if (field === 'isUrgent' && value === false) {
+        return {
+          ...prev,
+          [field]: value,
+          urgencyDays: 0
+        };
+      }
+      return {
+        ...prev,
+        [field]: value
+      };
+    });
   };
 
   const handleReset = () => {
@@ -372,6 +415,7 @@ const App: React.FC = () => {
     }
     
     setForm({
+      hourlyRate: 30,
       source: '',
       workType: '',
       elementsCount: 10,
@@ -384,16 +428,64 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="page-wrapper">
-      <div className="container">
-                 <div className="header">
-           <h1>Design Calculator</h1>
-           <p>Cost Estimation Tool for WeTrio</p>
+    <>
+             {/* Экран загрузки */}
+       {isLoading && (
+         <div className="loading-overlay">
+           <div className="loading-progress">
+             <div className="loading-progress-bar"></div>
+           </div>
          </div>
+       )}
+      
+      <div className="page-wrapper">
+        <div className="container">
+                   <div className="header">
+             <h1>Design Calculator</h1>
+             <p>Cost Estimation Tool for WeTrio</p>
+           </div>
 
         <div className="main-content">
           <div className="form-section">
             
+                         <div className="form-group">
+               <label className="form-label">Cost per Hour</label>
+               <div className="hourly-rate-input-container">
+                 <span className="hourly-rate-currency">$</span>
+                 <input
+                   type="number"
+                   className="hourly-rate-input"
+                   min="1"
+                   max="999"
+                   value={form.hourlyRate}
+                   onChange={(e) => handleInputChange('hourlyRate', parseInt(e.target.value) || 30)}
+                   placeholder="30"
+                 />
+                 <div className="hourly-rate-controls-horizontal">
+                   <button 
+                     className="hourly-rate-control-btn"
+                     onClick={() => handleInputChange('hourlyRate', Math.max(form.hourlyRate - 1, 1))}
+                     disabled={form.hourlyRate <= 1}
+                     title="Decrease"
+                   >
+                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                       <path d="M5 12h14"/>
+                     </svg>
+                   </button>
+                   <button 
+                     className="hourly-rate-control-btn"
+                     onClick={() => handleInputChange('hourlyRate', Math.min(form.hourlyRate + 1, 999))}
+                     disabled={form.hourlyRate >= 999}
+                     title="Increase"
+                   >
+                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                       <path d="M12 5v14M5 12h14"/>
+                     </svg>
+                   </button>
+                 </div>
+               </div>
+             </div>
+
             <CustomSelect
               value={form.source}
               onChange={(value) => handleInputChange('source', value)}
@@ -500,9 +592,10 @@ const App: React.FC = () => {
          <span>Reset</span>
        </button>
        
-       <VersionInfo />
-     </div>
-   );
- };
+               <VersionInfo />
+      </div>
+    </>
+  );
+};
 
 export default App;

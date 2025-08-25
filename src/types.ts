@@ -1,4 +1,5 @@
 export interface ProjectForm {
+  hourlyRate: number;
   source: string;
   workType: string;
   elementsCount: number;
@@ -26,9 +27,7 @@ export const SOURCE_OPTIONS: Option[] = [
   { value: 'fiverr', label: 'Fiverr (+20%)' },
   { value: 'upwork', label: 'Upwork (+20%)' },
   { value: 'freelancer', label: 'Freelancer (+20%)' },
-  { value: 'telegram', label: 'Telegram' },
-  { value: 'internal', label: 'Internal' },
-  { value: 'other', label: 'Other' }
+  { value: 'telegram', label: 'Telegram' }
 ];
 
 export const WORK_TYPE_OPTIONS: Option[] = [
@@ -42,8 +41,7 @@ export const WORK_TYPE_OPTIONS: Option[] = [
   { value: 'social_media', label: 'Social Media' },
   { value: 'print', label: 'Print' },
   { value: 'illustration', label: 'Illustration' },
-  { value: 'ui_ux', label: 'UI/UX Hourly Rate' },
-  { value: 'delegated_support', label: 'Delegated Support' },
+  { value: 'hourly_rate', label: 'Hourly Rate' },
   { value: 'web_development', label: 'Web Page Development' }
 ];
 
@@ -79,9 +77,9 @@ export const DISCOUNT_OPTIONS: Option[] = [
 // Function to get dynamic label for elements count based on work type
 export const getElementsLabel = (workType: string): string => {
   switch (workType) {
-    case 'presentationDesign':
-    case 'presentationFormat':
-      return 'Number of Slides';
+    case 'presentation_design':
+    case 'presentation_format':
+      return 'Number of Pages';
     case 'template':
       return 'Number of Pages';
     case 'website_design':
@@ -94,8 +92,7 @@ export const getElementsLabel = (workType: string): string => {
       return 'Number of Items';
     case 'illustration':
       return 'Number of Illustrations';
-    case 'ui_ux':
-    case 'delegated_support':
+    case 'hourly_rate':
       return 'Number of Hours';
     case 'logo':
       return 'Number of Options';
