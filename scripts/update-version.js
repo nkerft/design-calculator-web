@@ -1,54 +1,51 @@
 const fs = require('fs');
-const path = require('path');
 const { execSync } = require('child_process');
+const path = require('path');
 
-// Get current commit number
-function getCommitNumber() {
+// Get the last commit information
+function getLastCommitInfo() {
   try {
-    // Get total number of commits in the repository
+    // Get commit hash
+    const commitHash = execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim().substring(0, 8);
+    
+    // Get commit date
+    const commitDate = execSync('git log -1 --format=%cd --date=short', { encoding: 'utf8' }).trim();
+    
+    // Get total number of commits
     const commitCount = execSync('git rev-list --count HEAD', { encoding: 'utf8' }).trim();
-    return parseInt(commitCount, 10);
+    
+    return {
+      hash: commitHash,
+      date: commitDate,
+      count: parseInt(commitCount, 10)
+    };
   } catch (error) {
-    console.log('Could not get commit count, using timestamp fallback');
-    return Math.floor(Date.now() / 1000000) % 10000;
+    console.error('Error getting git information:', error.message);
+    return {
+      hash: 'unknown',
+      date: new Date().toISOString().split('T')[0],
+      count: 0
+    };
   }
 }
 
-// Get current commit hash
-function getCommitHash() {
-  try {
-    return execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim();
-  } catch (error) {
-    return 'dev';
-  }
-}
-
-// Calculate version based on commit number
-function calculateVersion(commitNumber) {
+// Calculate version based on commit count
+function calculateVersion(commitCount) {
   const major = 1;
-  const minor = Math.floor(commitNumber / 100);
-  const patch = commitNumber % 100;
-  return `${major}.${minor}.${patch}`;
+  const minor = Math.floor(commitCount / 100);
+  const patch = commitCount % 100;
+  return `v${major}.${minor}.${patch}`;
 }
 
-// Get current values
-const commitNumber = getCommitNumber();
-const commitHash = getCommitHash();
-const newVersion = calculateVersion(commitNumber);
-const buildDate = new Date().toISOString().split('T')[0];
-
-// Update package.json
-const packagePath = path.join(__dirname, '..', 'package.json');
-const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
-packageJson.version = newVersion;
-fs.writeFileSync(packagePath, JSON.stringify(packageJson, null, 2) + '\n');
-
-// Update version.ts
-const versionPath = path.join(__dirname, '..', 'src', 'version.ts');
-const versionContent = `// Version information
-export const APP_VERSION = '${newVersion}';
-export const BUILD_DATE = '${buildDate}';
-export const COMMIT_HASH = '${commitHash}';
+// Update version.ts file
+function updateVersionFile(commitInfo) {
+  const version = calculateVersion(commitInfo.count);
+  const versionFilePath = path.join(__dirname, '..', 'src', 'version.ts');
+  
+  const versionContent = `// Version information - Auto-generated from git
+export const APP_VERSION = '${version}';
+export const BUILD_DATE = '${commitInfo.date}';
+export const COMMIT_HASH = '${commitInfo.hash}';
 
 // Get commit number from environment or calculate from hash
 function getCommitNumber(): number {
@@ -58,7 +55,7 @@ function getCommitNumber(): number {
   }
   
   // Fallback: try to extract from hash or use timestamp
-  if (COMMIT_HASH && COMMIT_HASH !== 'dev') {
+  if (COMMIT_HASH && COMMIT_HASH.length >= 4) {
     // Use first 4 characters of hash as number (hex to decimal)
     const hashPart = COMMIT_HASH.substring(0, 4);
     return parseInt(hashPart, 16);
@@ -99,6 +96,20 @@ export const VERSION_INFO = {
 };
 `;
 
-fs.writeFileSync(versionPath, versionContent);
+  try {
+    fs.writeFileSync(versionFilePath, versionContent, 'utf8');
+    console.log(`✅ Version updated: ${version} — ${commitInfo.date}`);
+    console.log(`📝 Commit hash: ${commitInfo.hash}`);
+    console.log(`🔢 Commit count: ${commitInfo.count}`);
+  } catch (error) {
+    console.error('Error updating version file:', error.message);
+  }
+}
 
-console.log(`Version updated to ${newVersion} (commit #${commitNumber}, hash: ${commitHash})`);
+// Main execution
+if (require.main === module) {
+  const commitInfo = getLastCommitInfo();
+  updateVersionFile(commitInfo);
+}
+
+module.exports = { getLastCommitInfo, calculateVersion, updateVersionFile };
