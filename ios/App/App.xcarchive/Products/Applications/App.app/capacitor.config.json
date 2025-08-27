@@ -1,0 +1,12 @@
+{
+	"appId": "com.wetrio.designcalculator",
+	"appName": "Design Calculator - WeTrio",
+	"webDir": "build",
+	"server": {
+		"androidScheme": "https"
+	},
+	"ios": {
+		"contentInset": "always"
+	},
+	"packageClassList": []
+}

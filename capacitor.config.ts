@@ -4,11 +4,12 @@ const config: CapacitorConfig = {
   appId: 'com.wetrio.designcalculator',
   appName: 'Design Calculator - WeTrio',
   webDir: 'build',
+  backgroundColor: '#15191C',
   server: {
     androidScheme: 'https'
   },
   ios: {
-    contentInset: 'always'
+    contentInset: 'never'
   }
 };
 

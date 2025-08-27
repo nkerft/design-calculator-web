@@ -594,6 +594,8 @@ const App: React.FC = () => {
        
                <VersionInfo />
       </div>
+      {/* Нижняя подложка цвета футера для безопасной области iOS */}
+      <div className="footer-extension" />
     </>
   );
 };
