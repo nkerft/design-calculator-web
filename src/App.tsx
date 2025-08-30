@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ProjectForm, CalculationResult } from './types';
 import { SOURCE_OPTIONS, WORK_TYPE_OPTIONS, REGION_OPTIONS, URGENCY_BUTTON_OPTIONS, DISCOUNT_OPTIONS, getElementsLabel } from './types';
-import { calculateProjectCost, formatPriceUSD, formatPriceRUB } from './calculator';
+import { calculateProjectCost, formatPriceUSD, formatPriceRUB, setUsdToRubRate } from './calculator';
+import { getUsdToRubRate, getCachedUsdToRubRate } from './exchangeRate';
 import VersionInfo from './components/VersionInfo';
 
 // Custom dropdown component
@@ -345,6 +346,7 @@ const App: React.FC = () => {
 
   const [results, setResults] = useState<CalculationResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [usdRub, setUsdRub] = useState<number | null>(getCachedUsdToRubRate());
 
   // Эффект для загрузки страницы
   useEffect(() => {
@@ -367,6 +369,27 @@ const App: React.FC = () => {
       clearTimeout(timer);
       document.body.classList.remove('loading');
     };
+  }, []);
+
+  // Инициализация курса USD/RUB один раз в начале дня
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await getUsdToRubRate();
+        if (!cancelled) {
+          setUsdToRubRate(data.rate);
+          setUsdRub(data.rate);
+          // Пересчитать результаты с актуальным курсом
+          setResults(calculateProjectCost(form));
+        }
+      } catch (e) {
+        // Если сеть недоступна — остаётся кэш или дефолтный курс из calculator.ts
+        console.error('Failed to init USD/RUB rate', e);
+      }
+    })();
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Calculate results after any field change

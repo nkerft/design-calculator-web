@@ -35,8 +35,18 @@ const CONFIG = {
   rounding: { usd: 1, rub: 10 }
 };
 
-// Current exchange rate (USD to RUB)
-const USD_TO_RUB_RATE = 95.5;
+// Текущий курс (USD -> RUB). Может быть обновлён из внешнего модуля.
+let USD_TO_RUB_RATE = 95.5;
+
+export function setUsdToRubRate(rate: number): void {
+  if (Number.isFinite(rate) && rate > 0) {
+    USD_TO_RUB_RATE = rate;
+  }
+}
+
+export function getUsdToRubRateValue(): number {
+  return USD_TO_RUB_RATE;
+}
 
 // Utility function to clamp value between min and max
 function clamp(value: number, min: number, max: number): number {
