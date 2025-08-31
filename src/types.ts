@@ -24,25 +24,23 @@ export interface Option {
 }
 
 export const SOURCE_OPTIONS: Option[] = [
-  { value: 'fiverr', label: 'Fiverr' },
-  { value: 'upwork', label: 'Upwork' },
-  { value: 'freelancer', label: 'Freelancer' },
-  { value: 'telegram', label: 'Telegram (-20%)' }
+  { value: 'freelance_platforms', label: 'Freelance Platforms' },
+  { value: 'telegram', label: 'Telegram (-20%)' },
+  { value: 'other', label: 'Other (-20%)' }
 ];
 
 export const WORK_TYPE_OPTIONS: Option[] = [
   { value: 'presentation_format', label: 'Presentation Format' },
   { value: 'presentation_design', label: 'Presentation Design' },
   { value: 'template', label: 'Template (Presentation)' },
-  { value: 'website_design', label: 'Website Design' },
-  { value: 'landing_page', label: 'Landing Page' },
+  { value: 'uiux_design', label: 'UI/UX Design' },
   { value: 'logo', label: 'Logo' },
-  { value: 'branding', label: 'Logo+Brandbook+Aidentities' },
+  { value: 'branding', label: 'Branding Design' },
   { value: 'social_media', label: 'Social Media' },
   { value: 'print', label: 'Print' },
   { value: 'illustration', label: 'Illustration' },
   { value: 'hourly_rate', label: 'Hourly Rate' },
-  { value: 'web_development', label: 'Web Page Development' }
+  { value: 'web_development', label: 'Web Development' }
 ];
 
 export const REGION_OPTIONS: Option[] = [
@@ -82,6 +80,7 @@ export const getElementsLabel = (workType: string): string => {
       return 'Number of Pages';
     case 'template':
       return 'Number of Pages';
+    case 'uiux_design':
     case 'website_design':
     case 'landing_page':
     case 'web_development':

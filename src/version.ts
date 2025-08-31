@@ -1,7 +1,7 @@
 // Version information - Auto-generated from git
-export const APP_VERSION = 'v1.0.33';
-export const BUILD_DATE = '2025-08-25';
-export const COMMIT_HASH = '0becbea0';
+export const APP_VERSION = 'v1.0.37';
+export const BUILD_DATE = '2025-08-30';
+export const COMMIT_HASH = 'b9d5b16f';
 
 // Get commit number from environment or calculate from hash
 function getCommitNumber(): number {

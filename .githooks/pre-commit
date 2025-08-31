@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+# Update version file before commit
+node scripts/update-version.js
+
+git add src/version.ts

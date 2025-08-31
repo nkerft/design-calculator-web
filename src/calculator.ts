@@ -3,21 +3,23 @@ import { ProjectForm, CalculationResult } from './types';
 // Configuration object
 const CONFIG = {
   workTypes: {
-    presentation_format: { base: 0.5, min: 0.17, breakpoint: 150, type_adj_pp: -4 }, // 0.5 hours per page
-    presentation_design: { base: 1.0, min: 0.33, breakpoint: 150, type_adj_pp: 0 }, // 1 hour per page
+    // Set base == min to keep constant hours per unit
+    presentation_format: { base: 0.5, min: 0.5, breakpoint: 150, type_adj_pp: -4 }, // 0.5 hours per page
+    presentation_design: { base: 1.0, min: 1.0, breakpoint: 150, type_adj_pp: 0 }, // 1 hour per page
     template: { base: 6.67, min: 1.0, breakpoint: 1, type_adj_pp: 0 }, // 6.67 hours for 5 pages
-    website_design: { base: 6.67, min: 2.67, breakpoint: 50, type_adj_pp: 0 }, // 6.67 hours per screen
+    website_design: { base: 6.67, min: 2.67, breakpoint: 50, type_adj_pp: 0 }, // legacy
+    uiux_design: { base: 6.0, min: 6.0, breakpoint: 50, type_adj_pp: 0 }, // 6 hours per screen
     landing_page: { base: 5.33, min: 2.0, breakpoint: 30, type_adj_pp: 0 }, // 5.33 hours per screen
     logo: { base: 3.67, min: 1.33, breakpoint: 20, type_adj_pp: 0 }, // 3.67 hours per option
     branding: { base: 11.67, min: 4.0, breakpoint: 25, type_adj_pp: 0 }, // 11.67 hours per element
-    social_media: { base: 1.33, min: 0.5, breakpoint: 50, type_adj_pp: 0 }, // 1.33 hours per post
+    social_media: { base: 1.0, min: 1.0, breakpoint: 50, type_adj_pp: 0 }, // 1 hour per post
     print: { base: 1.83, min: 0.67, breakpoint: 40, type_adj_pp: 0 }, // 1.83 hours per item
     illustration: { base: 2.67, min: 1.0, breakpoint: 30, type_adj_pp: 0 }, // 2.67 hours per illustration
     hourly_rate: { base: 1.0, min: 0.83, breakpoint: 80, type_adj_pp: 0 }, // 1 hour per hour
     web_development: { base: 13.33, min: 5.0, breakpoint: 20, type_adj_pp: 0 } // 13.33 hours per screen
   },
   multipliers: {
-    source: { fiverr: 1.0, upwork: 1.0, freelancer: 1.0, telegram: 0.8 },
+    source: { freelance_platforms: 1.0, telegram: 0.8, other: 0.8 },
     urgency: { 1: 1.5, 3: 1.3, normal: 1.0 },
     region: { 
       north_america: 0.10, europe: 0.0, asia: 0.10, cis: 0.0, 
@@ -71,14 +73,14 @@ function calcBaseSum(n: number, workType: string, hourlyRate: number): number {
   // Special logic for template
   if (workType === 'template') {
     if (n <= 5) {
-      const hours = 6.67; // Fixed hours for 5 pages
+      const hours = 5.0; // Fixed hours for 5 pages
       const totalCost = hours * hourlyRate;
       console.log(`calcBaseSum: workType=${workType}, n=${n}, template logic: 5 pages = ${hours}h × $${hourlyRate}/h = $${totalCost}`);
       return totalCost;
     } else {
-      const baseHours = 6.67; // Hours for first 5 pages
+      const baseHours = 5.0; // Hours for first 5 pages
       const additionalPages = n - 5;
-      const additionalHours = additionalPages * 1.0; // 1 hour per additional page
+      const additionalHours = additionalPages * 0.5; // 0.5 hour per additional page
       const totalHours = baseHours + additionalHours;
       const totalCost = totalHours * hourlyRate;
       console.log(`calcBaseSum: workType=${workType}, n=${n}, template logic: ${baseHours}h for 5 pages + ${additionalHours}h for ${additionalPages} additional pages = ${totalHours}h × $${hourlyRate}/h = $${totalCost}`);
@@ -171,29 +173,51 @@ function calcDesignerPay(baseSum: number, urgency: number, sharePP: number, disc
 
 // Calculate estimated hours
 function calculateEstimatedHours(workType: string, quantity: number): { min: number; max: number } {
-  const hoursConfig = {
-    presentation_design: { min: 1.0, max: 1.0 }, // 1 hour per page
-    presentation_format: { min: 0.5, max: 0.5 }, // 0.5 hours per page
-    template: { min: 1.33, max: 1.33 }, // 1.33 hours per page (6.67/5)
-    website_design: { min: 6.67, max: 6.67 }, // 6.67 hours per screen
-    landing_page: { min: 10.0, max: 10.0 }, // 10 hours for 1 screen (300/30 = 10 hours)
-    logo: { min: 2.22, max: 2.22 }, // 2.22 hours per option (6.67 hours for 3 options)
-    branding: { min: 11.67, max: 11.67 }, // 11.67 hours per element
-    social_media: { min: 1.33, max: 1.33 }, // 1.33 hours per post
-    print: { min: 1.83, max: 1.83 }, // 1.83 hours per item
-    illustration: { min: 2.67, max: 2.67 }, // 2.67 hours per illustration
-    hourly_rate: { min: 1.0, max: 1.0 }, // 1 hour per hour
-    web_development: { min: 13.33, max: 13.33 } // 13.33 hours per screen
-  };
-  
-  const config = hoursConfig[workType as keyof typeof hoursConfig];
-  if (!config) {
-    return { min: Math.round(quantity * 1), max: Math.round(quantity * 1) };
+  const n = Math.max(0, quantity);
+  let avgHours = 0;
+
+  switch (workType) {
+    case 'presentation_format':
+      avgHours = n * 0.5; // 0.5h per page
+      break;
+    case 'presentation_design':
+      avgHours = n * 1.0; // 1h per page
+      break;
+    case 'template':
+      if (n <= 5) avgHours = n > 0 ? 5.0 : 0;
+      else avgHours = 5.0 + (n - 5) * 0.5;
+      break;
+    case 'uiux_design':
+      avgHours = n * 6.0; // 6h per screen
+      break;
+    case 'social_media':
+      avgHours = n * 1.0; // 1h per post
+      break;
+    case 'logo':
+      avgHours = Math.ceil(n / 3) * 6.67; // unchanged logic (~6.67h per 3 options)
+      break;
+    case 'branding':
+      avgHours = n * 11.67; // unchanged
+      break;
+    case 'print':
+      avgHours = n * 1.83; // unchanged
+      break;
+    case 'illustration':
+      avgHours = n * 2.67; // unchanged
+      break;
+    case 'hourly_rate':
+      avgHours = n * 1.0; // 1h per hour
+      break;
+    case 'web_development':
+      avgHours = n * 13.33; // unchanged
+      break;
+    default:
+      // Fallback to 1h per unit if unknown
+      avgHours = n * 1.0;
   }
-  
-  const minHours = Math.round(quantity * config.min);
-  const maxHours = Math.round(quantity * config.max);
-  
+
+  const minHours = Math.round(avgHours * 0.8);
+  const maxHours = Math.round(Math.max(minHours, avgHours * 1.2));
   return { min: minHours, max: maxHours };
 }
 

@@ -52,6 +52,15 @@ body.loading {
   overflow: hidden;
 }
 
+.loading-title {
+  font-family: 'Druk Wide Bold', 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 2.2rem;
+  color: #ffffff;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
 .loading-progress {
   width: 300px;
   height: 4px;
@@ -152,7 +161,7 @@ code {
 }
 
 .header h1 {
-  font-size: 4rem;
+  font-size: 4.5rem;
   font-weight: 900;
   font-family: 'Druk Wide Bold', 'Inter', sans-serif;
   color: #C3FF19;
@@ -174,11 +183,15 @@ code {
 }
 
 .header p {
-  color: #a0a0a0;
-  font-size: 1.2rem;
-  max-width: 500px;
+  color: #ffffff;
+  opacity: 0.9;
+  font-family: 'Inter', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  font-size: 1rem;
+  max-width: 600px;
   margin: 0 auto;
-  font-weight: 400;
   animation: slideInUp 1s ease-out 0.3s both;
 }
 
@@ -209,7 +222,7 @@ code {
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(20px);
   border-radius: 24px;
-  padding: 56px;
+  padding: 48px 36px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
   animation: slideInUp 1s ease-out 0.5s both;
@@ -233,7 +246,7 @@ code {
   gap: 8px;
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.6);
+  color: #ffffff; /* белая иконка и текст на десктопе */
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -304,7 +317,7 @@ code {
 }
 
 .reset-button:hover {
-  color: #C3FF19;
+  color: #ffffff; /* при ховере остаётся белой */
   background: rgba(195, 255, 25, 0.1);
   transform: scale(1.05);
 }
@@ -351,7 +364,7 @@ code {
 }
 
 .form-group {
-  margin-bottom: 44px;
+  margin-bottom: 32px;
   animation: fadeInUp 0.8s ease-out;
   position: relative;
 }
@@ -395,13 +408,30 @@ code {
   display: block;
   margin-bottom: 16px;
   font-weight: 700;
-  font-family: 'Druk Wide Bold', 'Inter', sans-serif;
+  font-family: 'Inter', sans-serif;
   color: #ffffff;
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   opacity: 0.9;
   transition: all 0.3s ease;
+}
+
+/* Header row: toggle + label in one line */
+.form-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.form-header .form-label {
+  margin: 0;
+}
+
+/* Убираем верхний отступ у тоггла в строке заголовка для точного выравнивания */
+.form-header .toggle-group {
+  margin-top: 0;
 }
 
 .form-label:hover {
@@ -437,6 +467,7 @@ code {
 }
 
 .form-input[type=number] {
+  appearance: textfield;
   -moz-appearance: textfield;
 }
 
@@ -453,14 +484,15 @@ code {
   padding-right: 90px;
   border: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
-  font-size: 16px;
+  font-size: 18px;
   background: rgba(255, 255, 255, 0.05);
   color: #ffffff;
   transition: all 0.3s ease;
   outline: none;
   backdrop-filter: blur(10px);
   text-align: center;
-  font-weight: 600;
+  font-weight: 700;
+  font-family: 'Druk Wide Bold', 'Inter', sans-serif;
 }
 
 .number-input-field:focus {
@@ -477,6 +509,7 @@ code {
 }
 
 .number-input-field[type=number] {
+  appearance: textfield;
   -moz-appearance: textfield;
 }
 
@@ -760,8 +793,8 @@ code {
 .toggle-switch {
   position: relative;
   display: inline-block;
-  width: 60px;
-  height: 34px;
+  width: 46px; /* чуть меньше по длине */
+  height: 26px;
 }
 
 .toggle-switch input {
@@ -786,10 +819,11 @@ code {
 .toggle-slider:before {
   position: absolute;
   content: "";
-  height: 26px;
-  width: 26px;
-  left: 2px;
-  bottom: 2px;
+  height: 18px; /* круг оставляем меньше */
+  width: 18px;
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%);
   background-color: #ffffff;
   transition: 0.3s;
   border-radius: 50%;
@@ -802,7 +836,7 @@ input:checked + .toggle-slider {
 }
 
 input:checked + .toggle-slider:before {
-  transform: translateX(26px);
+  transform: translate(20px, -50%); /* (46 - 2*2) - 18 - 4 = 20 */
   background-color: #15191C;
 }
 
@@ -906,7 +940,7 @@ input:checked ~ .toggle-label {
 }
 
 .result-item {
-  margin-bottom: 48px;
+  margin-bottom: 24px; /* уменьшили расстояние между блоками */
   padding: 0;
   background: transparent;
   border: none;
@@ -918,9 +952,14 @@ input:checked ~ .toggle-label {
   margin-bottom: 0;
 }
 
+/* У последней цены перед Estimated hours делаем ещё меньше отступ */
+.results .result-item:last-of-type {
+  margin-bottom: 12px;
+}
+
 .result-label {
   font-weight: 700;
-  font-family: 'Druk Wide Bold', 'Inter', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 0.85rem;
   color: #ffffff;
   opacity: 0.8;
@@ -968,8 +1007,8 @@ input:checked ~ .toggle-label {
   font-weight: 900;
   font-family: 'Druk Wide Bold', 'Inter', sans-serif;
   color: #C3FF19;
-  animation: pulse 2s infinite;
-  text-shadow: 0 0 10px rgba(195, 255, 25, 0.3);
+  text-shadow: none;
+  opacity: 1;
 }
 
 .copy-button {
@@ -1057,7 +1096,7 @@ input:checked ~ .toggle-label {
 /* Discount buttons styles */
 .discount-buttons {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   margin-top: 16px;
   flex-wrap: wrap;
   width: 100%;
@@ -1069,8 +1108,9 @@ input:checked ~ .toggle-label {
   color: #ffffff;
   padding: 16px 24px;
   border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 16px; /* как у дропдаунов */
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
   cursor: pointer;
   transition: all 0.3s ease;
   flex: 1;
@@ -1081,6 +1121,9 @@ input:checked ~ .toggle-label {
   align-items: center;
   justify-content: center;
 }
+
+/* три кнопки делят ширину равномерно */
+.discount-buttons .discount-button { flex: 1 1 0; }
 
 .discount-button:hover {
   background: rgba(255, 255, 255, 0.1);
@@ -1089,31 +1132,155 @@ input:checked ~ .toggle-label {
 }
 
 .discount-button--active {
-  background: #C3FF19;
-  color: #15191C;
-  border-color: #C3FF19;
-  font-weight: 600;
+  background: rgba(195, 255, 25, 0.12);
+  color: #C3FF19;
+  border-color: rgba(195, 255, 25, 0.4);
+  font-weight: 700;
 }
 
 .discount-button--active:hover {
-  background: #b3e619;
-  border-color: #b3e619;
+  background: rgba(195, 255, 25, 0.18);
+  border-color: rgba(195, 255, 25, 0.5);
   transform: translateY(-1px);
 }
 
-.discount-note {
-  font-size: 0.7rem;
-  color: #666666;
-  margin-top: 8px;
-  font-style: italic;
+/* Input-styled discount button occupying same slot */
+.discount-button-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  width: 100%;
+  max-width: 140px;
+  transition: all 0.3s ease;
   text-align: center;
 }
 
-/* Urgency buttons styles */
+.discount-button-input:focus {
+  border-color: #C3FF19;
+  box-shadow: 0 0 0 4px rgba(195, 255, 25, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+  outline: none;
+}
+/* Discount input styled like fields */
+.discount-input-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 0;
+}
+
+.discount-input {
+  width: 100%;
+  padding: 16px 20px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  transition: all 0.3s ease;
+  outline: none;
+  backdrop-filter: blur(10px);
+  text-align: center;
+  font-weight: 600;
+}
+
+.discount-input:focus {
+  border-color: #C3FF19;
+  box-shadow: 0 0 0 4px rgba(195, 255, 25, 0.1);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.discount-percent-sign {
+  color: #C3FF19;
+  font-weight: 700;
+}
+
+/* New discount rate input like hourly input with +/- */
+.discount-rate-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: 0;
+}
+
+.discount-rate-input-container.inline {
+  flex: 1 1 auto;
+}
+
+.discount-rate-input {
+  width: 100%;
+  padding: 16px 20px;
+  padding-right: 90px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  transition: all 0.3s ease;
+  outline: none;
+  backdrop-filter: blur(10px);
+  text-align: center;
+  font-weight: 600;
+}
+
+.discount-rate-input:focus {
+  border-color: #C3FF19;
+  box-shadow: 0 0 0 4px rgba(195, 255, 25, 0.1);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.discount-rate-input::-webkit-outer-spin-button,
+.discount-rate-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.discount-rate-input[type=number] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.discount-rate-controls-horizontal {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
+
+.discount-rate-control-btn {
+  background: rgba(195, 255, 25, 0.1);
+  border: 1px solid rgba(195, 255, 25, 0.2);
+  color: #C3FF19;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.discount-rate-control-btn:hover:not(:disabled) {
+  background: rgba(195, 255, 25, 0.2);
+  border-color: rgba(195, 255, 25, 0.3);
+  box-shadow: 0 0 10px rgba(195, 255, 25, 0.15);
+}
+
+/* Urgency buttons styles (match Discount buttons) */
 .urgency-buttons {
   display: flex;
   gap: 16px;
-  margin-top: 20px;
+  margin-top: 0;
   flex-wrap: wrap;
   width: 100%;
 }
@@ -1122,10 +1289,11 @@ input:checked ~ .toggle-label {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #ffffff;
-  padding: 16px 24px;
+  padding: 16px 28px; /* больше пространства для текста */
   border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 16px; /* как у дропдаунов */
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
   cursor: pointer;
   transition: all 0.3s ease;
   flex: 1;
@@ -1135,6 +1303,7 @@ input:checked ~ .toggle-label {
   display: flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
 }
 
 .urgency-button:hover {
@@ -1144,21 +1313,21 @@ input:checked ~ .toggle-label {
 }
 
 .urgency-button--active {
-  background: #C3FF19;
-  color: #15191C;
-  border-color: #C3FF19;
-  font-weight: 600;
+  background: rgba(195, 255, 25, 0.12);
+  color: #C3FF19;
+  border-color: rgba(195, 255, 25, 0.4);
+  font-weight: 700;
 }
 
 .urgency-button--active:hover {
-  background: #b3e619;
-  border-color: #b3e619;
+  background: rgba(195, 255, 25, 0.18);
+  border-color: rgba(195, 255, 25, 0.5);
   transform: translateY(-1px);
 }
 
 /* Estimated hours styles */
 .estimated-hours {
-  margin-top: 40px;
+  margin-top: 16px; /* уменьшили расстояние от цен */
   padding: 20px 24px;
   background: rgba(255, 255, 255, 0.02);
   border-radius: 12px;
@@ -1199,6 +1368,7 @@ input:checked ~ .toggle-label {
   width: 100%;
   padding: 16px 20px;
   padding-right: 90px;
+  padding-left: 56px; /* как у варианта с кнопкой, аналогично +/- по ширине */
   border: 2px solid rgba(195, 255, 25, 0.3);
   border-radius: 16px;
   font-size: 18px;
@@ -1286,14 +1456,94 @@ input:checked ~ .toggle-label {
   background-color: rgba(195, 255, 25, 0.08);
 }
 
-.hourly-rate-currency {
+/* Inline currency select styled as our custom select */
+/* Кнопка валюты внутри поля (как +/-) */
+.currency-inline-wrapper {
   position: absolute;
-  left: 20px;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 32px; /* как у кнопок +/- */
+  padding-left: 12px; /* отступ от левого края поля */
+  padding-right: 12px; /* симметрично справа, чтобы dropdown совпадал по ширине */
+  z-index: 10001;
+  pointer-events: none; /* кликабельной будет только кнопка */
+}
+.currency-inline { width: 100%; margin-bottom: 0; }
+
+.currency-inline .custom-select__header {
+  height: 32px; /* как у кнопок +/- */
+  min-height: 32px !important; /* перекрываем базовый min-height 56px */
+  min-width: 40px;
+  box-sizing: border-box;
+  padding: 8px; /* как у +/- */
+  border: 1px solid rgba(195, 255, 25, 0.2);
+  background: rgba(195, 255, 25, 0.1); /* как у +/- */
+  border-radius: 8px;
+  display: inline-flex; /* не растягиваем на всю ширину */
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  pointer-events: auto; /* кликабельна */
+  width: auto !important; /* фиксируем авто-ширину */
+  color: #C3FF19; /* как у +/- */
+  font-size: 16px;
+  line-height: 16px;
+  font-weight: 600;
+}
+.currency-inline .custom-select__arrow {
+  width: 16px; /* по требованию */
+  height: 16px; /* по требованию */
+  display: inline-flex;
+  align-items: center;
+}
+
+.currency-inline__value {
   color: #C3FF19;
   font-weight: 700;
-  font-size: 18px;
-  font-family: 'Druk Wide Bold', 'Inter', sans-serif;
-  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  line-height: 14px; /* вписываемся в 16px высоты */
+}
+
+.currency-inline__dropdown {
+  left: 0 !important;
+  right: 0 !important; /* на всю ширину wrapper, который совпадает с полем */
+  min-width: 100% !important;
+  z-index: 10002; /* поверх всего */
+}
+
+/* Сблизить стрелку с символом и убрать лишний отступ справа */
+.currency-inline .custom-select__arrow {
+  margin-left: 4px !important;
+}
+
+/* Убираем обводки/outline у дропдауна валюты */
+.currency-inline .custom-select__header,
+.currency-inline .custom-select__header:focus,
+.currency-inline .custom-select__header:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.currency-inline .custom-select__header:hover {
+  transform: none;
+  background: rgba(195, 255, 25, 0.2); /* как у +/- */
+  border-color: rgba(195, 255, 25, 0.3);
+  box-shadow: 0 0 10px rgba(195, 255, 25, 0.15);
+}
+
+/* Отключаем любые эффекты на кнопке при открытии; анимация остаётся только у иконки */
+.currency-inline .custom-select__header--open {
+  border: 1px solid rgba(195, 255, 25, 0.2);
+  box-shadow: none;
+  background-color: rgba(195, 255, 25, 0.1);
+  transform: none;
+}
+
+.currency-inline .custom-select__header:active {
+  transform: scale(0.95);
 }
 
 .hourly-rate-input::-webkit-outer-spin-button,
@@ -1303,6 +1553,7 @@ input:checked ~ .toggle-label {
 }
 
 .hourly-rate-input[type=number] {
+  appearance: textfield;
   -moz-appearance: textfield;
 }
 
@@ -1423,12 +1674,12 @@ input:checked ~ .toggle-label {
   
   /* Заголовки и подзаголовок на мобильных */
   .header h1 {
-    font-size: 3rem; /* было 2.5rem → +~8px */
-    line-height: 1.05; /* плотнее строка */
+    font-size: 3.2rem;
+    line-height: 1.05;
   }
   .header p {
-    font-size: 0.875rem; /* 14px */
-    line-height: 1.4; /* чуть компактнее */
+    font-size: 0.85rem;
+    line-height: 1.4;
   }
   
   /* Исправляем проблемы с dropdown на мобильных */
@@ -1440,6 +1691,22 @@ input:checked ~ .toggle-label {
     top: auto !important;
     left: 16px !important;
     right: 16px !important;
+    max-height: 300px !important;
+    overflow-y: auto !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  /* Дропдаун валюты — те же правила, во всю ширину поля/экрана */
+  .currency-inline__dropdown {
+    z-index: 99999 !important;
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+    position: absolute !important; /* от контейнера валюты */
+    top: calc(100% + 8px) !important; /* под кнопкой валюты */
+    left: 0 !important;
+    right: 0 !important; /* ровно по ширине input (через wrapper) */
     max-height: 300px !important;
     overflow-y: auto !important;
     opacity: 1 !important;
@@ -1462,17 +1729,30 @@ input:checked ~ .toggle-label {
     width: 100%;
     max-width: 500px;
     padding: 32px 24px;
-    order: 1;
+    order: 2;
   }
   
   .results-section {
     position: static;
     width: 100%;
     max-width: 500px;
-    padding: 30px 20px;
-    order: 2;
-    margin-top: 20px;
+    padding: 32px 24px; /* те же паддинги, что у form-section */
+    order: 1;
+    margin-top: 0;
   }
+
+  /* Цены в столбик на мобильных */
+  .result-prices { flex-direction: column; gap: 16px; align-items: stretch; }
+  .price-item {
+    padding: 20px 24px;
+    border-radius: 12px;
+  }
+  .price-value { font-size: 1.2rem; }
+
+  /* Компактный empty state */
+  .empty-state { padding: 12px 8px; }
+  .empty-state h3 { font-size: 1rem; margin-bottom: 4px; }
+  .empty-state p { font-size: 0.8rem; }
   
   /* Убираем дублирующиеся стили для results-column */
   
@@ -1511,9 +1791,9 @@ input:checked ~ .toggle-label {
   }
 
   .version-info {
-    margin-top: auto;
+    margin-top: 80px; /* увеличили расстояние от контента до футера */
     padding: 16px 0;
-    margin-bottom: 80px; /* Отступ для плавающей кнопки */
+    margin-bottom: 88px; /* чуть больше для плавающей кнопки */
   }
   
   .version-main {

@@ -1,9 +1,64 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ProjectForm, CalculationResult } from './types';
-import { SOURCE_OPTIONS, WORK_TYPE_OPTIONS, REGION_OPTIONS, URGENCY_BUTTON_OPTIONS, DISCOUNT_OPTIONS, getElementsLabel } from './types';
-import { calculateProjectCost, formatPriceUSD, formatPriceRUB, setUsdToRubRate } from './calculator';
+import { SOURCE_OPTIONS, WORK_TYPE_OPTIONS, URGENCY_BUTTON_OPTIONS, getElementsLabel } from './types';
+import { calculateProjectCost, formatPriceUSD, formatPriceRUB, setUsdToRubRate, getUsdToRubRateValue } from './calculator';
 import { getUsdToRubRate, getCachedUsdToRubRate } from './exchangeRate';
 import VersionInfo from './components/VersionInfo';
+
+// Inline currency dropdown in custom style
+const CurrencySelectInline: React.FC<{ value: 'USD' | 'RUB'; onChange: (v: 'USD' | 'RUB') => void }> = ({ value, onChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onDocClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setIsOpen(false);
+    };
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, []);
+
+  const currentLabel = value === 'USD' ? '$' : '₽';
+  const OPTIONS: Array<{ value: 'USD' | 'RUB'; label: string }> = [
+    { value: 'USD', label: '$ (USD) — US Dollar' },
+    { value: 'RUB', label: '₽ (RUB) — Russian Ruble' }
+  ];
+
+  return (
+    <div className="currency-inline" ref={ref}>
+      <div
+        className={`custom-select__header ${isOpen ? 'custom-select__header--open' : ''}`}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span className="currency-inline__value">{currentLabel}</span>
+        <svg
+          className={`custom-select__arrow ${isOpen ? 'custom-select__arrow--open' : ''}`}
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+        >
+          <path d="M7 10l5 5 5-5"/>
+        </svg>
+      </div>
+      {isOpen && (
+        <div className="custom-select__dropdown currency-inline__dropdown">
+          {OPTIONS.map((opt) => (
+            <div
+              key={opt.value}
+              className={`custom-select__option ${value === opt.value ? 'custom-select__option--selected' : ''}`}
+              onClick={() => { onChange(opt.value); setIsOpen(false); }}
+            >
+              <span>{opt.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 // Custom dropdown component
 interface CustomSelectProps {
@@ -219,9 +274,8 @@ const PriceDisplay: React.FC<PriceDisplayProps> = ({ label, price, subtitle }) =
             onClick={() => copyToClipboard(formatPriceUSD(price), 'usd')}
             title="Copy USD price"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-label="Copy">
+              <path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/>
             </svg>
           </button>
         </div>
@@ -232,9 +286,8 @@ const PriceDisplay: React.FC<PriceDisplayProps> = ({ label, price, subtitle }) =
             onClick={() => copyToClipboard(formatPriceRUB(price), 'rub')}
             title="Copy RUB price"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-label="Copy">
+              <path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/>
             </svg>
           </button>
         </div>
@@ -262,17 +315,26 @@ interface UrgencyButtonsProps {
 const UrgencyButtons: React.FC<UrgencyButtonsProps> = ({ isUrgent, urgencyDays, onUrgentChange, onUrgencyDaysChange }) => {
   return (
     <div className="form-group">
-      <label className="form-label">Project Urgency</label>
-      <div className="toggle-group">
-        <label className="toggle-switch">
-          <input
-            type="checkbox"
-            checked={isUrgent}
-            onChange={(e) => onUrgentChange(e.target.checked)}
-          />
-          <span className="toggle-slider"></span>
-        </label>
-        <span className="toggle-label">Urgent project</span>
+      <div className="form-header">
+        <div className="toggle-group">
+          <label className="toggle-switch">
+            <input
+              type="checkbox"
+              checked={isUrgent}
+              onChange={(e) => onUrgentChange(e.target.checked)}
+            />
+            <span className="toggle-slider"></span>
+          </label>
+        </div>
+        <span
+          className="form-label toggle-text"
+          role="button"
+          tabIndex={0}
+          onClick={() => onUrgentChange(!isUrgent)}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onUrgentChange(!isUrgent); } }}
+        >
+          Project Urgency
+        </span>
       </div>
       
       {isUrgent && (
@@ -292,42 +354,73 @@ const UrgencyButtons: React.FC<UrgencyButtonsProps> = ({ isUrgent, urgencyDays, 
   );
 };
 
-// Discount buttons component
-interface DiscountButtonsProps {
+// Discount control: 5%, 10% buttons + adjustable 15% field with +/-
+interface DiscountControlProps {
   value: number;
   onChange: (value: number) => void;
 }
 
-const DiscountButtons: React.FC<DiscountButtonsProps> = ({ value, onChange }) => {
+const DiscountControl: React.FC<DiscountControlProps> = ({ value, onChange }) => {
+
+  const setPreset = (pct: number) => {
+    onChange(pct);
+  };
+
+  const handleToggle = (checked: boolean) => {
+    if (!checked) return onChange(0);
+    // При включении скидки включаем первый пресет (5%) по умолчанию
+    const next = 5;
+    onChange(next);
+  };
+
   return (
     <div className="form-group">
-      <label className="form-label">Discount</label>
-      <div className="toggle-group">
-        <label className="toggle-switch">
-          <input
-            type="checkbox"
-            checked={value > 0}
-            onChange={(e) => onChange(e.target.checked ? 10 : 0)}
-          />
-          <span className="toggle-slider"></span>
-        </label>
-        <span className="toggle-label">Apply discount</span>
+      <div className="form-header">
+        <div className="toggle-group">
+          <label className="toggle-switch">
+            <input
+              type="checkbox"
+              checked={value > 0}
+              onChange={(e) => handleToggle(e.target.checked)}
+            />
+            <span className="toggle-slider"></span>
+          </label>
+        </div>
+        <span
+          className="form-label toggle-text"
+          role="button"
+          tabIndex={0}
+          onClick={() => handleToggle(!(value > 0))}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleToggle(!(value > 0)); } }}
+        >
+          Discount
+        </span>
       </div>
-      
       {value > 0 && (
         <div className="discount-buttons">
-          {DISCOUNT_OPTIONS.map((option) => (
-            <button
-              key={option.value}
-              className={`discount-button ${value === parseInt(option.value) ? 'discount-button--active' : ''}`}
-              onClick={() => onChange(parseInt(option.value))}
-            >
-              {option.label}
-            </button>
-          ))}
+          <button
+            type="button"
+            className={`discount-button ${value === 5 ? 'discount-button--active' : ''}`}
+            onClick={() => setPreset(5)}
+          >
+            5%
+          </button>
+          <button
+            type="button"
+            className={`discount-button ${value === 10 ? 'discount-button--active' : ''}`}
+            onClick={() => setPreset(10)}
+          >
+            10%
+          </button>
+          <button
+            type="button"
+            className={`discount-button ${value === 15 ? 'discount-button--active' : ''}`}
+            onClick={() => setPreset(15)}
+          >
+            15%
+          </button>
         </div>
       )}
-
     </div>
   );
 };
@@ -347,6 +440,8 @@ const App: React.FC = () => {
   const [results, setResults] = useState<CalculationResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [usdRub, setUsdRub] = useState<number | null>(getCachedUsdToRubRate());
+  const [currency, setCurrency] = useState<'USD' | 'RUB'>('USD');
+  const [hourInput, setHourInput] = useState<string>('30');
 
   // Эффект для загрузки страницы
   useEffect(() => {
@@ -392,6 +487,27 @@ const App: React.FC = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Регулярное автообновление курса и при фокусе окна
+  useEffect(() => {
+    let isDisposed = false;
+    const refresh = async () => {
+      try {
+        const data = await getUsdToRubRate();
+        if (!isDisposed) {
+          setUsdToRubRate(data.rate);
+          setUsdRub(data.rate);
+        }
+      } catch {}
+    };
+    const intervalId = window.setInterval(refresh, 60 * 60 * 1000); // раз в час
+    window.addEventListener('focus', refresh);
+    return () => {
+      isDisposed = true;
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', refresh);
+    };
+  }, []);
+
   // Calculate results after any field change
   useEffect(() => {
     const calculatedResults = calculateProjectCost(form);
@@ -419,6 +535,14 @@ const App: React.FC = () => {
           ...prev,
           [field]: value,
           urgencyDays: 0
+        };
+      } else if (field === 'isUrgent' && value === true) {
+        // При включении срочности выбираем первый пресет
+        const firstUrgency = parseInt(URGENCY_BUTTON_OPTIONS[0].value);
+        return {
+          ...prev,
+          [field]: value,
+          urgencyDays: firstUrgency
         };
       }
       return {
@@ -455,6 +579,7 @@ const App: React.FC = () => {
              {/* Экран загрузки */}
        {isLoading && (
          <div className="loading-overlay">
+           <div className="loading-title">wetrio</div>
            <div className="loading-progress">
              <div className="loading-progress-bar"></div>
            </div>
@@ -472,42 +597,102 @@ const App: React.FC = () => {
           <div className="form-section">
             
                          <div className="form-group">
-               <label className="form-label">Cost per Hour</label>
-               <div className="hourly-rate-input-container">
-                 <span className="hourly-rate-currency">$</span>
-                 <input
-                   type="number"
-                   className="hourly-rate-input"
-                   min="1"
-                   max="999"
-                   value={form.hourlyRate}
-                   onChange={(e) => handleInputChange('hourlyRate', parseInt(e.target.value) || 30)}
-                   placeholder="30"
-                 />
-                 <div className="hourly-rate-controls-horizontal">
-                   <button 
-                     className="hourly-rate-control-btn"
-                     onClick={() => handleInputChange('hourlyRate', Math.max(form.hourlyRate - 1, 1))}
-                     disabled={form.hourlyRate <= 1}
-                     title="Decrease"
-                   >
-                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                       <path d="M5 12h14"/>
-                     </svg>
-                   </button>
-                   <button 
-                     className="hourly-rate-control-btn"
-                     onClick={() => handleInputChange('hourlyRate', Math.min(form.hourlyRate + 1, 999))}
-                     disabled={form.hourlyRate >= 999}
-                     title="Increase"
-                   >
-                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                       <path d="M12 5v14M5 12h14"/>
-                     </svg>
-                   </button>
-                 </div>
-               </div>
-             </div>
+              <label className="form-label">Cost per Hour</label>
+              {/* Currency button inside input field */}
+              <div className="hourly-rate-input-container">
+                <div className="currency-inline-wrapper">
+                  <CurrencySelectInline
+                    value={currency}
+                    onChange={(cur) => {
+                      const rate = usdRub ?? getUsdToRubRateValue();
+                      if (cur === 'RUB') {
+                        const rub = 2500;
+                        const nextUsd = Math.max(1, Math.round(rub / rate));
+                        handleInputChange('hourlyRate', Math.min(nextUsd, 999));
+                        setHourInput(String(rub));
+                        setCurrency('RUB');
+                      } else {
+                        handleInputChange('hourlyRate', 30);
+                        setHourInput('30');
+                        setCurrency('USD');
+                      }
+                    }}
+                  />
+                </div>
+                <input
+                  type="number"
+                  className="hourly-rate-input"
+                  min={1}
+                  max={999999}
+                  value={hourInput}
+                  onChange={(e) => {
+                    const rate = usdRub ?? getUsdToRubRateValue();
+                    const rawStr = e.target.value;
+                    setHourInput(rawStr);
+                    const raw = parseInt(rawStr);
+                    if (isNaN(raw)) return;
+                    if (currency === 'USD') {
+                      const nextUsd = Math.max(1, Math.min(raw, 999));
+                      handleInputChange('hourlyRate', nextUsd);
+                    } else {
+                      const nextUsd = Math.max(1, Math.round(raw / rate));
+                      handleInputChange('hourlyRate', Math.min(nextUsd, 999));
+                    }
+                  }}
+                  placeholder={(() => {
+                    return currency === 'USD' ? '30' : String(2500);
+                  })()}
+                />
+                <div className="hourly-rate-controls-horizontal">
+                  <button 
+                    className="hourly-rate-control-btn"
+                    onClick={() => {
+                      const rate = usdRub ?? getUsdToRubRateValue();
+                      if (currency === 'USD') {
+                        const nextUsd = Math.max(form.hourlyRate - 1, 1);
+                        handleInputChange('hourlyRate', nextUsd);
+                        setHourInput(String(nextUsd));
+                      } else {
+                        const currentRub = parseInt(hourInput);
+                        const curRub = isNaN(currentRub) ? Math.round(form.hourlyRate * rate) : currentRub;
+                        const decRub = Math.max(0, curRub - 100);
+                        const nextUsd = Math.max(1, Math.round(decRub / rate));
+                        handleInputChange('hourlyRate', nextUsd);
+                        setHourInput(String(decRub));
+                      }
+                    }}
+                    title="Decrease"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M5 12h14"/>
+                    </svg>
+                  </button>
+                  <button 
+                    className="hourly-rate-control-btn"
+                    onClick={() => {
+                      const rate = usdRub ?? getUsdToRubRateValue();
+                      if (currency === 'USD') {
+                        const nextUsd = Math.min(form.hourlyRate + 1, 999);
+                        handleInputChange('hourlyRate', nextUsd);
+                        setHourInput(String(nextUsd));
+                      } else {
+                        const currentRub = parseInt(hourInput);
+                        const curRub = isNaN(currentRub) ? Math.round(form.hourlyRate * rate) : currentRub;
+                        const incRub = curRub + 100;
+                        const nextUsd = Math.max(1, Math.round(incRub / rate));
+                        handleInputChange('hourlyRate', Math.min(nextUsd, 999));
+                        setHourInput(String(incRub));
+                      }
+                    }}
+                    title="Increase"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
 
             <CustomSelect
               value={form.source}
@@ -539,15 +724,9 @@ const App: React.FC = () => {
               onUrgencyDaysChange={(days) => handleInputChange('urgencyDays', days)}
             />
 
-            <CustomSelect
-              value={form.region}
-              onChange={(value) => handleInputChange('region', value)}
-              options={REGION_OPTIONS}
-              placeholder="Select region"
-              label="Project Region"
-            />
+            {/* Project Region is hidden per requirements; field remains in state for calculations */}
 
-            <DiscountButtons
+            <DiscountControl
               value={form.discount}
               onChange={(value) => handleInputChange('discount', value)}
             />
@@ -559,11 +738,11 @@ const App: React.FC = () => {
               {results ? (
                 <>
                   <PriceDisplay 
-                    label="Project Cost for WeTrio" 
+                    label="WeTrio Cost" 
                     price={results.clientPrice} 
                   />
                   <PriceDisplay 
-                    label="Designer Work Cost" 
+                    label="Designer Cost" 
                     price={results.designerPrice}
                   />
                   <div className="estimated-hours">
